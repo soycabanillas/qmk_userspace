@@ -1,3 +1,4 @@
+SRC += platform_qmk_impl.c
 SRC += abstractionsqmk.c
 SRC += key_buffer.c
 SRC += pipeline_oneshot_modifier.c

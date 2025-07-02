@@ -2,7 +2,7 @@
 #include "commons.h"
 #include "deferred_exec.h"
 #include "abstractionsqmk.h"
-#include "print.h"
+#include "platform_qmk.h"
 #include "quantum.h"
 #include "pipeline_tap_dance.h"
 #include <stdlib.h>
@@ -11,10 +11,10 @@
 #define g_tap_timeout 200
 
 typedef struct {
-    uint16_t keycodemodifier;
+    platform_keycode_t keycodemodifier;
 } t_layer_status;
 
-typedef bool (*custom_behaviour_callback)(uint16_t, abskeyevent_t, t_layer_status*, void*);
+typedef bool (*custom_behaviour_callback)(platform_keycode_t, abskeyevent_t, t_layer_status*, void*);
 
 typedef enum {
     TDCL_TAP_KEY_SENDKEY,
@@ -27,7 +27,7 @@ typedef enum {
 typedef struct {
     uint8_t repetitions;
     td_customlayer_action_t action;
-    uint16_t keycode;
+    platform_keycode_t keycode;
     uint8_t layer;
 } custom_action_custom_behaviour;
 
@@ -99,7 +99,7 @@ uint16_t lastKeyUntappedTime = 0;
 
 uint32_t hold_span_reached_timer(uint32_t trigger_time, void *cb_arg) {
 // #ifdef CONSOLE_ENABLE
-//   uprintf("hold_span_reached_timer\n");
+//   platform_log_debug("hold_span_reached_timer");
 // #endif
     custom_switch_layer_custom_data *status = (custom_switch_layer_custom_data*)cb_arg;
     status->hold_state = _HOLD_TRESHOLD_DETECTED;
@@ -112,11 +112,11 @@ uint32_t hold_span_reached_timer(uint32_t trigger_time, void *cb_arg) {
 
 uint32_t key_repetition_span_exceeded_timer(uint32_t trigger_time, void *cb_arg) {
 // #ifdef CONSOLE_ENABLE
-//   uprintf("key_repetition_span_exceeded_timer\n");
+//   platform_log_debug("key_repetition_span_exceeded_timer");
 // #endif
     custom_switch_layer_custom_data *status = (custom_switch_layer_custom_data*)cb_arg;
     status->key_repetition_span_exceeded_token = 0;
-    uprintf("key_repetition_span_exceeded_timer - tap_code16_delay\n");
+    platform_log_debug("key_repetition_span_exceeded_timer - tap_code16_delay");
     tap_code16_delay(status->selected_keycode, 10);
     //tap_code16(status->selected_keycode);
     // print_buffer(status->original_layer, &press_buffer[status->press_buffer_pos], status->keybuffer_length);
@@ -159,11 +159,11 @@ bool is_there_actions_after(custom_switch_layer_custom_data* custom_switch_layer
     return false;
 }
 
-bool custom_switch_layer_custom_function (uint16_t keycode, abskeyevent_t event, t_layer_status *status, void *user_data) {
+bool custom_switch_layer_custom_function (platform_keycode_t keycode, abskeyevent_t event, t_layer_status *status, void *user_data) {
     custom_switch_layer_custom_data *layer_status = (custom_switch_layer_custom_data *)user_data;
-    //uprintf("keycode: %u, keycodemodifier: %u\n", keycode, status->keycodemodifier);
+    //platform_log_debug("keycode: %u, keycodemodifier: %u", keycode, status->keycodemodifier);
     if (layer_status->actionslength == 0) {
-        uprintf("cslcd - exit because actionslength == 0");
+        platform_log_debug("cslcd - exit because actionslength == 0");
         return false;
     }
     if (keycode == (status->keycodemodifier)) {
@@ -227,7 +227,7 @@ bool custom_switch_layer_custom_function (uint16_t keycode, abskeyevent_t event,
                 }
             } else if (layer_status->hold_state == _HOLD_TRESHOLD_DETECTED) {
                 layer_off(layer_status->selected_layer);
-                clear_keyboard();
+                platform_clear_keyboard();
                 // The value of layer_status->hold_or_tap_sequence has been set on the deferred execution to _HOLD
             } else if (layer_status->haskeyaction) {
                 layer_status->hold_or_tap_sequence = _TAP;
@@ -277,7 +277,7 @@ custom_action_custom_behaviour* createbehaviouraction(uint8_t repetitions, td_cu
     return allocation;
 }
 
-custom_behaviour_config* createbehaviour(uint16_t keycodemodifier, custom_action_custom_behaviour* actions[], size_t actionslength) {
+custom_behaviour_config* createbehaviour(platform_keycode_t keycodemodifier, custom_action_custom_behaviour* actions[], size_t actionslength) {
     custom_switch_layer_custom_data userdata = {
         .hold_or_tap_sequence = _HOLD_OR_TAP_STATE_NOT_SET
     };
@@ -300,7 +300,7 @@ custom_behaviour_config* createbehaviour(uint16_t keycodemodifier, custom_action
     return allocation;
 }
 
-bool macros_process_key(uint16_t keycode, abskeyevent_t abskeyevent) {
+bool macros_process_key(platform_keycode_t keycode, abskeyevent_t abskeyevent) {
     if (abskeyevent.pressed) {
         lastKeyTapped = keycode;
         lastKeyTappedTime = abskeyevent.time;
@@ -311,12 +311,12 @@ bool macros_process_key(uint16_t keycode, abskeyevent_t abskeyevent) {
     }
     //print_layer_status();
     //Esc and Enter should remove sticky keys... but what about other selections that use numbers or letters?
-    //uprintf("sizeof *custom_layers: %u, nelements: %u, sizeof *custom_layers->layers: %u, modifier1: %u, modifier2: %u\n", sizeof *custom_layers, nelements, sizeof *custom_layers->layers, CKC_LAY_MOUSE_Q, CKC_LAY_NUMBERS_R);
+    //platform_log_debug("sizeof *custom_layers: %u, nelements: %u, sizeof *custom_layers->layers: %u, modifier1: %u, modifier2: %u", sizeof *custom_layers, nelements, sizeof *custom_layers->layers, CKC_LAY_MOUSE_Q, CKC_LAY_NUMBERS_R);
     for (uint8_t i = 0; i < custom_layers->length; i++)
     {
-        //uprintf("custom_layers_length: %u, keycodemodifier: %u\n", custom_layers->length, custom_layers->layers[i]->status.keycodemodifier);
+        //platform_log_debug("custom_layers_length: %u, keycodemodifier: %u", custom_layers->length, custom_layers->layers[i]->status.keycodemodifier);
         custom_behaviour_config *layer_status = custom_layers->layers[i];
-        //uprintf("keycodemodifier: %u\n", layer_status->status.keycodemodifier);
+        //platform_log_debug("keycodemodifier: %u", layer_status->status.keycodemodifier);
         if (layer_status->callback(keycode, abskeyevent, &layer_status->status, layer_status->user_data) == false) return false;
     }
     return true;

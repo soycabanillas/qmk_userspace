@@ -1,25 +1,23 @@
-#include "_wait.h"
-#include "action.h"
 #include "key_buffer.h"
 #include "keymap_common.h"
-#include "print.h"
+#include "platform_qmk.h"
 #include <stdlib.h>
 #include <string.h>
 
 typedef struct {
-    keypos_t key;
-    uint16_t keycode;
+    platform_keypos_t key;
+    platform_keycode_t keycode;
     uint8_t layer;
     bool release_on_buffer; //This flag marks that the key has been released, but the key is not erased until the buffer is processed. This way, info like the time the key was pressed, or the keycode can be obtained.
-    uint16_t time;
+    platform_time_t time;
 } only_press_buffer_item_t;
 
 typedef struct {
-    keypos_t key;
-    uint16_t keycode;
+    platform_keypos_t key;
+    platform_keycode_t keycode;
     uint8_t layer;
     bool is_press;
-    uint16_t time;
+    platform_time_t time;
 } press_buffer_item_t;
 
 #define ONLY_PRESS_BUFFER_MAX 5
@@ -32,7 +30,7 @@ uint8_t press_buffer_pos = 0;
 
 uint8_t current_layer = 0;
 
-bool info_is_pressed(uint16_t keycode){
+bool info_is_pressed(platform_keycode_t keycode){
     for (size_t i = only_press_buffer_pos; i-- > 0;)
     {
         if (only_press_buffer[i].keycode == keycode) {
@@ -45,26 +43,26 @@ bool info_is_pressed(uint16_t keycode){
 void print_press_buffers(int16_t num_keys) {
     uint8_t num_keys_to_print = num_keys;
     if (num_keys_to_print > ONLY_PRESS_BUFFER_MAX) num_keys_to_print = ONLY_PRESS_BUFFER_MAX;
-    uprintf("-only -  pos: %2u || ", only_press_buffer_pos);
+    platform_log_debug("-only -  pos: %2u || ", only_press_buffer_pos);
     for (size_t i = 0; i < num_keys_to_print; i++)
     {
-        uprintf("col: %3u row: %2u key:0x%04X || ", only_press_buffer[i].key.col, only_press_buffer[i].key.row, only_press_buffer[i].keycode);
+        platform_log_debug("col: %3u row: %2u key:0x%04X || ", only_press_buffer[i].key.col, only_press_buffer[i].key.row, only_press_buffer[i].keycode);
     }
-    uprintf("\n");
+    platform_log_debug("");
 
     if (num_keys_to_print > PRESS_BUFFER_MAX) num_keys_to_print = PRESS_BUFFER_MAX;
-    uprintf("-press-  pos: %2u || ", press_buffer_pos);
+    platform_log_debug("-press-  pos: %2u || ", press_buffer_pos);
     for (size_t i = 0; i < num_keys_to_print; i++)
     {
-        uprintf("col: %3u row: %2u key:0x%04X || ", press_buffer[i].key.col, press_buffer[i].key.row, press_buffer[i].keycode);
+        platform_log_debug("col: %3u row: %2u key:0x%04X || ", press_buffer[i].key.col, press_buffer[i].key.row, press_buffer[i].keycode);
     }
-    uprintf("\n");
+    platform_log_debug("");
 }
 
 // Add the key press or release to the press_buffer buffer.
 // Add the key to the only_press_buffer when is a pressed or update the key to set the key as released.
 // This buffers can be consumed after several key presses and releases. The same key (position) can be pressed and released and stored on this buffers. This is needed for example if a pipeline requires the information of repetition of a key.
-bool add_to_press_buffer(uint16_t keycode, keypos_t key, uint16_t time, bool is_press) {
+bool add_to_press_buffer(platform_keycode_t keycode, platform_keypos_t key, platform_time_t time, bool is_press) {
     // Checks the available space in press_buffer.
     // If there is a press, ensure that the buffer has enough space to store both the current key press and a future key release. Otherwise, if the buffer becomes full, releasing keys will be impossible.
     // This only applies in basic situations, such as when too many keys are pressed simultaneously. If a pipeline fails to remove keys from the buffer, it can still become full.
@@ -176,24 +174,20 @@ bool process_key_pool(void) {
         }
 
         if (press_buffer_selected->keycode <= 0xFF) {
-            #ifdef CONSOLE_ENABLE
-                uprintf("basic_key 0x%04X\n", press_buffer_selected->keycode);
-            #endif
+            platform_log_debug("basic_key 0x%04X", press_buffer_selected->keycode);
             // keypos_t key = {
             //     .col = press_buffer_selected->key.col,
             //     .row = press_buffer_selected->key.row
             // };
             // uint16_t fallthrough = keymap_key_to_keycode(10, key);
-            #ifdef CONSOLE_ENABLE
-                uint16_t fallthrough2 = keymap_key_to_keycode(0, press_buffer[0].key);
-                uprintf("SHOULD BE : 0x%04X\n", fallthrough2);
-            #endif
-            uint16_t fallthrough = press_buffer_selected->keycode;
+            platform_keycode_t fallthrough2 = keymap_key_to_keycode(0, press_buffer[0].key);
+            platform_log_debug("SHOULD BE : 0x%04X", fallthrough2);
+            platform_keycode_t fallthrough = press_buffer_selected->keycode;
             if (press_buffer[0].is_press == true) {
-                register_code(fallthrough);
+                platform_register_code(fallthrough);
                 wait_ms(10);
             } else {
-                unregister_code(fallthrough);
+                platform_unregister_code(fallthrough);
                 wait_ms(10);
             }
             further_process_required = false;
@@ -206,13 +200,11 @@ bool process_key_pool(void) {
 
         remove_from_press_buffer(0);
     }
-    #ifdef CONSOLE_ENABLE
-        print_press_buffers(10);
-    #endif
+    print_press_buffers(10);
     return further_process_required;
 }
 
-bool pipeline_process_key(uint16_t keycode, abskeyevent_t abskeyevent) {
+bool pipeline_process_key(platform_keycode_t keycode, abskeyevent_t abskeyevent) {
     if (add_to_press_buffer(keycode, abskeyevent.key, abskeyevent.time, abskeyevent.pressed)) {
         return process_key_pool();
     }
