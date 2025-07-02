@@ -76,17 +76,17 @@ void callback_ckc_replace_shifted_0(replacer_callback_input* input, replacer_cal
 
 
 void* pipeline_key_replacer_initialize_user_data(void) {
-    size_t n_modifiers = 8;
+    size_t n_modifiers = 7;
     key_replacer_global.pairs = malloc(sizeof(pipeline_key_replacer_pairs_array_t) + n_modifiers * sizeof(pipeline_key_replacer_pair_t*));
     key_replacer_global.pairs->length = n_modifiers;
 
-    key_replacer_global.pairs->modifier_pairs[1] = pipeline_key_replacer_create_pairs(CKC_REPLACE_SHIFTED_2, callback_ckc_replace_shifted_2);
-    key_replacer_global.pairs->modifier_pairs[2] = pipeline_key_replacer_create_pairs(CKC_REPLACE_SHIFTED_3, callback_ckc_replace_shifted_3);
-    key_replacer_global.pairs->modifier_pairs[3] = pipeline_key_replacer_create_pairs(CKC_REPLACE_SHIFTED_4, callback_ckc_replace_shifted_4);
-    key_replacer_global.pairs->modifier_pairs[4] = pipeline_key_replacer_create_pairs(CKC_REPLACE_SHIFTED_5, callback_ckc_replace_shifted_5);
-    key_replacer_global.pairs->modifier_pairs[5] = pipeline_key_replacer_create_pairs(CKC_REPLACE_SHIFTED_6, callback_ckc_replace_shifted_6);
-    key_replacer_global.pairs->modifier_pairs[6] = pipeline_key_replacer_create_pairs(CKC_REPLACE_SHIFTED_9, callback_ckc_replace_shifted_9);
-    key_replacer_global.pairs->modifier_pairs[7] = pipeline_key_replacer_create_pairs(CKC_REPLACE_SHIFTED_0, callback_ckc_replace_shifted_0);
+    key_replacer_global.pairs->modifier_pairs[0] = pipeline_key_replacer_create_pairs(CKC_REPLACE_SHIFTED_2, callback_ckc_replace_shifted_2);
+    key_replacer_global.pairs->modifier_pairs[1] = pipeline_key_replacer_create_pairs(CKC_REPLACE_SHIFTED_3, callback_ckc_replace_shifted_3);
+    key_replacer_global.pairs->modifier_pairs[2] = pipeline_key_replacer_create_pairs(CKC_REPLACE_SHIFTED_4, callback_ckc_replace_shifted_4);
+    key_replacer_global.pairs->modifier_pairs[3] = pipeline_key_replacer_create_pairs(CKC_REPLACE_SHIFTED_5, callback_ckc_replace_shifted_5);
+    key_replacer_global.pairs->modifier_pairs[4] = pipeline_key_replacer_create_pairs(CKC_REPLACE_SHIFTED_6, callback_ckc_replace_shifted_6);
+    key_replacer_global.pairs->modifier_pairs[5] = pipeline_key_replacer_create_pairs(CKC_REPLACE_SHIFTED_9, callback_ckc_replace_shifted_9);
+    key_replacer_global.pairs->modifier_pairs[6] = pipeline_key_replacer_create_pairs(CKC_REPLACE_SHIFTED_0, callback_ckc_replace_shifted_0);
     return &key_replacer_global;
 }
 
