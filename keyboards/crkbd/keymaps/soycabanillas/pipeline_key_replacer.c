@@ -2,7 +2,7 @@
 #include "action.h"
 #include "commons.h"
 #include "abstractionsqmk.h"
-#include "keymacros.h"
+#include "key_buffer.h"
 #include "print.h"
 #include "pipeline_key_replacer.h"
 #include <stdlib.h>

@@ -1,6 +1,6 @@
 #include "_wait.h"
 #include "action.h"
-#include "keymacros.h"
+#include "key_buffer.h"
 #include "keymap_common.h"
 #include "print.h"
 #include <stdlib.h>

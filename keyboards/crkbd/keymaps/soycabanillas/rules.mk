@@ -1,5 +1,5 @@
 SRC += abstractionsqmk.c
-SRC += keymacrosex.c
+SRC += key_buffer.c
 SRC += pipeline_oneshot_modifier.c
 SRC += pipeline_key_replacer.c
 SRC += pipeline_tap_dance.c

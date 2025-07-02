@@ -18,7 +18,7 @@
 #include "print.h"
 #include "commons.h"
 #include "abstractionsqmk.h"
-#include "keymacros.h"
+#include "key_buffer.h"
 #include "pipeline_key_replacer.h"
 #include "pipeline_oneshot_modifier.h"
 #include "pipeline_tap_dance.h"
