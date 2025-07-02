@@ -1,7 +1,11 @@
+#include "_wait.h"
+#include "action.h"
 #include "commons.h"
-#include "keycode.h"
 #include "abstractionsqmk.h"
+#include "keymacros.h"
+#include "print.h"
 #include "pipeline_oneshot_modifier.h"
+#include <stdlib.h>
 
 typedef struct {
     uint16_t keycode;
@@ -48,11 +52,11 @@ void* pipeline_oneshot_modifier_initialize_user_data(void) {
 
 void pipeline_oneshot_modifier_callback(pipeline_callback_params_t* params, pipeline_config_t* config, void* user_data) {
     #ifdef CONSOLE_ENABLE
-        uprintf("pipeline_oneshot_modifier_callback || up: %u || press: %u\n", params->up, params->is_press);
+        uprintf("pipeline_oneshot_modifier_callback || up: %u || press: %u\n", params->up, params->callback_type);
     #endif
     pipeline_oneshot_modifier_global_t* data = (pipeline_oneshot_modifier_global_t*)user_data;
     bool found_modifier = false;
-    if (params->up == true && params->is_press == true) {
+    if (params->up == true && params->callback_type == PIPELINE_CALLBACK_KEY_PRESS) {
         for (size_t i = 0; i < data->pairs->length; i++)
         {
             if (data->pairs->modifier_pairs[i]->keycode == params->keycode) {
@@ -63,7 +67,7 @@ void pipeline_oneshot_modifier_callback(pipeline_callback_params_t* params, pipe
         }
     }
     if (found_modifier == false) {
-        if (data->modifiers != 0 && params->keycode <= 0xFF && params->up == true && params->is_press == true) {
+        if (data->modifiers != 0 && params->keycode <= 0xFF && params->up == true && params->callback_type == PIPELINE_CALLBACK_KEY_PRESS) {
             if (data->modifiers & MACRO_KEY_MODIFIER_LEFT_SHIFT) {
                 register_code(KC_LEFT_SHIFT);
                 wait_ms(10);

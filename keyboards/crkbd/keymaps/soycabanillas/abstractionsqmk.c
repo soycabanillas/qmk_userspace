@@ -1,6 +1,7 @@
 #include "abstractionsqmk.h"
 #include "commons.h"
 #include "limits.h"
+#include "quantum.h"
 
 void print_buffer(uint8_t layer_num, abskeyevent_t keybuffer[8], uint8_t keybuffer_length) {
     #ifdef CONSOLE_ENABLE

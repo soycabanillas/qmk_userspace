@@ -1,7 +1,16 @@
 #pragma once
 
-#include QMK_KEYBOARD_H
+#include <stddef.h>
 #include "commons.h"
+
+// typedef bool (*is_pressed)(uint16_t);
+// typedef void (*remove_from_press_buffer)(uint16_t);
+
+typedef enum {
+    PIPELINE_CALLBACK_KEY_PRESS,
+    PIPELINE_CALLBACK_KEY_RELEASE,
+    PIPELINE_CALLBACK_TIMER
+} pipeline_callback_type_t;
 
 typedef bool (*is_pressed)(uint16_t);
 
@@ -13,14 +22,12 @@ typedef struct {
     bool up;
     uint16_t keycode;
     keypos_t key;
-    bool is_press;
+    pipeline_callback_type_t callback_type;
     pipeline_info_t info;
 } pipeline_callback_params_t;
 
 typedef struct {
-    // bool remove_key_capture;
-    // bool ignore_releases_from_presses_before_macro_activation;
-    // bool ignore_presses_after_macro_key_release;
+    uint16_t callback_time;
 } pipeline_config_t;
 
 typedef void (*pipeline_callback)(pipeline_callback_params_t*, pipeline_config_t*, void*);

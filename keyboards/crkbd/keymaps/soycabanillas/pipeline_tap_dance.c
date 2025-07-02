@@ -1,7 +1,12 @@
+#include "action_layer.h"
 #include "commons.h"
-#include "keycode.h"
+#include "deferred_exec.h"
 #include "abstractionsqmk.h"
+#include "print.h"
+#include "quantum.h"
 #include "pipeline_tap_dance.h"
+#include <stdlib.h>
+#include <string.h>
 
 #define g_tap_timeout 200
 
@@ -368,5 +373,30 @@ void* pipeline_tap_dance_initialize_user_data(void) {
 }
 
 void pipeline_tap_dance_callback(pipeline_callback_params_t* params, pipeline_config_t* config, void* user_data) {
-
+    // if (abskeyevent.pressed) {
+    //     lastKeyTapped = keycode;
+    //     lastKeyTappedTime = abskeyevent.time;
+    // }
+    // else {
+    //     lastKeyUntapped = keycode;
+    //     lastKeyUntappedTime = abskeyevent.time;
+    // }
+    // if (params->more_data == true) {
+    //     if (params->up == true && params->is_press == true) {
+    //         for (uint8_t i = 0; i < custom_layers->length; i++)
+    //         {
+    //             custom_behaviour_config *layer_status = custom_layers->layers[i];
+    //             if (layer_status->status.keycodemodifier == params->keycode) {
+    //                 config->needs_more_data = true;
+    //             }
+    //             // if (layer_status->callback(keycode, abskeyevent, &layer_status->status, layer_status->user_data) == false) return false;
+    //         }
+    //     }
+    // } else {
+    //     if (params->up == true && params->is_press == true) {
+    //         #ifdef CONSOLE_ENABLE
+    //             uprintf("MORE_DATA : 0x%04X\n", params->keycode);
+    //         #endif
+    //     }
+    // }
 }

@@ -1,7 +1,11 @@
+#include "_wait.h"
+#include "action.h"
 #include "commons.h"
-#include "keycode.h"
 #include "abstractionsqmk.h"
+#include "keymacros.h"
+#include "print.h"
 #include "pipeline_key_replacer.h"
+#include <stdlib.h>
 
 typedef struct {
     uint8_t modifiers;
@@ -92,10 +96,10 @@ void* pipeline_key_replacer_initialize_user_data(void) {
 
 void pipeline_key_replacer_callback(pipeline_callback_params_t* params, pipeline_config_t* config, void* user_data) {
     #ifdef CONSOLE_ENABLE
-        uprintf("pipeline_key_replacer_callback || up: %u || press: %u\n", params->up, params->is_press);
+        uprintf("pipeline_key_replacer_callback || up: %u || press: %u\n", params->up, params->callback_type);
     #endif
     pipeline_key_replacer_global_t* data = (pipeline_key_replacer_global_t*)user_data;
-    if (params->up == true && params->is_press == true) {
+    if (params->up == true && params->callback_type == PIPELINE_CALLBACK_KEY_PRESS) {
         for (size_t i = 0; i < data->pairs->length; i++)
         {
             if (data->pairs->modifier_pairs[i]->keycode == params->keycode) {
@@ -145,7 +149,7 @@ void pipeline_key_replacer_callback(pipeline_callback_params_t* params, pipeline
                 break;
             }
         }
-    } else if (params->up == true && params->is_press == false) {
+    } else if (params->up == true && params->callback_type == PIPELINE_CALLBACK_KEY_RELEASE) {
         for (size_t i = 0; i < data->pairs->length; i++)
         {
             if (data->pairs->modifier_pairs[i]->keycode == params->keycode && data->pairs->modifier_pairs[i]->activated) {

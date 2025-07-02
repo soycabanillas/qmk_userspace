@@ -1,16 +1,23 @@
+#include "_wait.h"
+#include "action.h"
 #include "keymacros.h"
-#include "abstractionsqmk.h"
+#include "keymap_common.h"
+#include "print.h"
+#include <stdlib.h>
+#include <string.h>
 
 typedef struct {
     keypos_t key;
     uint16_t keycode;
-    bool release_on_buffer;
+    uint8_t layer;
+    bool release_on_buffer; //This flag marks that the key has been released, but the key is not erased until the buffer is processed. This way, info like the time the key was pressed, or the keycode can be obtained.
     uint16_t time;
 } only_press_buffer_item_t;
 
 typedef struct {
     keypos_t key;
     uint16_t keycode;
+    uint8_t layer;
     bool is_press;
     uint16_t time;
 } press_buffer_item_t;
@@ -54,6 +61,52 @@ void print_press_buffers(int16_t num_keys) {
     uprintf("\n");
 }
 
+// Add the key press or release to the press_buffer buffer.
+// Add the key to the only_press_buffer when is a pressed or update the key to set the key as released.
+// This buffers can be consumed after several key presses and releases. The same key (position) can be pressed and released and stored on this buffers. This is needed for example if a pipeline requires the information of repetition of a key.
+bool add_to_press_buffer(uint16_t keycode, keypos_t key, uint16_t time, bool is_press) {
+    // Checks the available space in press_buffer.
+    // If there is a press, ensure that the buffer has enough space to store both the current key press and a future key release. Otherwise, if the buffer becomes full, releasing keys will be impossible.
+    // This only applies in basic situations, such as when too many keys are pressed simultaneously. If a pipeline fails to remove keys from the buffer, it can still become full.
+    if ((is_press == true && press_buffer_pos + 1 < PRESS_BUFFER_MAX) || (is_press == false && press_buffer_pos < PRESS_BUFFER_MAX)) {
+        // Before adding the key to the press_buffer, make sure there is space available in only_press_buffer.
+        if (is_press == true) {
+            if (only_press_buffer_pos < ONLY_PRESS_BUFFER_MAX) {
+                only_press_buffer[only_press_buffer_pos].key.col = key.col;
+                only_press_buffer[only_press_buffer_pos].key.row = key.row;
+                only_press_buffer[only_press_buffer_pos].keycode = keycode;
+                only_press_buffer[only_press_buffer_pos].layer = current_layer;
+                only_press_buffer[only_press_buffer_pos].release_on_buffer = false;
+                only_press_buffer[only_press_buffer_pos].time = time;
+                only_press_buffer_pos = only_press_buffer_pos + 1;
+            } else {
+                return false;
+            }
+        } else {
+            //Check if the new release has a press already buffered
+            bool key_is_in_buffer = false;
+            for (size_t i = only_press_buffer_pos; i-- > 0;)
+            {
+                if (only_press_buffer[i].key.col == key.col && only_press_buffer[i].key.row == key.row && only_press_buffer[i].release_on_buffer == false) {
+                    only_press_buffer[i].release_on_buffer = true;
+                    key_is_in_buffer = true;
+                    break;
+                }
+            }
+            if (key_is_in_buffer == false) return false;
+        }
+        press_buffer[press_buffer_pos].key.col = key.col;
+        press_buffer[press_buffer_pos].key.row = key.row;
+        press_buffer[press_buffer_pos].keycode = keycode;
+        press_buffer[press_buffer_pos].layer = current_layer;
+        press_buffer[press_buffer_pos].is_press = is_press;
+        press_buffer[press_buffer_pos].time = time;
+        press_buffer_pos = press_buffer_pos + 1;
+        return true;
+    }
+    return false;
+}
+
 void remove_from_press_buffer(uint8_t pos) {
     if (press_buffer[pos].is_press == false) {
         for (size_t i = only_press_buffer_pos; i-- > 0;)
@@ -88,26 +141,38 @@ void remove_from_press_buffer(uint8_t pos) {
 //     return false;
 // }
 
-void execute_pipeline(bool up, uint8_t macro_buffer_pos, press_buffer_item_t* press_buffer_selected) {
-    // if (macro_selected.macro_config.ignore_releases_from_presses_before_macro_activation == true && check_if_release_is_before_press(press_buffer_selected->key, macro_selected->key)) return;
+void execute_pipeline(bool up, uint16_t callback_time, uint8_t macro_buffer_pos, press_buffer_item_t* press_buffer_selected) {
     pipeline_callback_params_t callback_params;
     callback_params.up = up;
-    callback_params.keycode = press_buffer_selected->keycode;
-    callback_params.key = press_buffer_selected->key;
-    callback_params.is_press = press_buffer_selected->is_press;
-    callback_params.info.is_pressed = &info_is_pressed;
+    if (callback_time == 0) {
+        callback_params.keycode = press_buffer_selected->keycode;
+        callback_params.key = press_buffer_selected->key;
+        if (press_buffer_selected->is_press == true) {
+            callback_params.callback_type = PIPELINE_CALLBACK_KEY_PRESS;
+        } else {
+            callback_params.callback_type = PIPELINE_CALLBACK_KEY_RELEASE;
+        }
+        callback_params.info.is_pressed = &info_is_pressed;
+    } else {
+        callback_params.callback_type = PIPELINE_CALLBACK_TIMER;
+    }
     pipeline_config_t config;
+    config.callback_time = 0;
     pipeline_array->pipelines[macro_buffer_pos]->definition->callback(&callback_params, &config, pipeline_array->pipelines[macro_buffer_pos]->definition->data);
-    // if (macro_selected.macro_config.remove_key_capture) remove_from_macro_buffer_by_pos(macro_buffer_pos);
 }
+
+//bool process_timer(void) {
+//    execute_pipeline(true, i, 15, NULL);
+//}
 
 bool process_key_pool(void) {
     bool further_process_required = true;
     while (press_buffer_pos > 0) {
         press_buffer_item_t* press_buffer_selected = &press_buffer[0];
+        //check first if there are pipelines waiting for more data
         for (size_t i = 0; i < pipeline_array->length; i++)
         {
-            execute_pipeline(true, i, press_buffer_selected);
+            execute_pipeline(true, 0, i, press_buffer_selected);
         }
 
         if (press_buffer_selected->keycode <= 0xFF) {
@@ -136,7 +201,7 @@ bool process_key_pool(void) {
 
         for (size_t i = pipeline_array->length; i-- > 0;)
         {
-            execute_pipeline(false, i, press_buffer_selected);
+            execute_pipeline(false, 0, i, press_buffer_selected);
         }
 
         remove_from_press_buffer(0);
@@ -145,49 +210,6 @@ bool process_key_pool(void) {
         print_press_buffers(10);
     #endif
     return further_process_required;
-}
-
-bool add_to_only_press_buffer(uint16_t keycode, keypos_t key, uint16_t time, bool is_press) {
-    if (is_press == true) {
-        if (only_press_buffer_pos < ONLY_PRESS_BUFFER_MAX) {
-            only_press_buffer[only_press_buffer_pos].key.col = key.col;
-            only_press_buffer[only_press_buffer_pos].key.row = key.row;
-            only_press_buffer[only_press_buffer_pos].keycode = keycode;
-            only_press_buffer[only_press_buffer_pos].release_on_buffer = false;
-            only_press_buffer[only_press_buffer_pos].time = time;
-            only_press_buffer_pos = only_press_buffer_pos + 1;
-            return true;
-        } else {
-            return false;
-        }
-    } else {
-        //Check if the new release has a press already buffered
-        for (size_t i = only_press_buffer_pos; i-- > 0;)
-        {
-            if (only_press_buffer[i].key.col == key.col && only_press_buffer[i].key.row == key.row && only_press_buffer[i].release_on_buffer == false) {
-                only_press_buffer[i].release_on_buffer = true;
-                return true;
-            }
-        }
-        return false;
-    }
-}
-
-bool add_to_press_buffer(uint16_t keycode, keypos_t key, uint16_t time, bool is_press) {
-    if ((is_press == true && press_buffer_pos + 1 < PRESS_BUFFER_MAX) || (is_press == false && press_buffer_pos < PRESS_BUFFER_MAX)) {
-        if (add_to_only_press_buffer(keycode, key, time, is_press)) {
-            press_buffer[press_buffer_pos].key.col = key.col;
-            press_buffer[press_buffer_pos].key.row = key.row;
-            press_buffer[press_buffer_pos].keycode = keycode;
-            press_buffer[press_buffer_pos].is_press = is_press;
-            press_buffer[press_buffer_pos].time = time;
-            press_buffer_pos = press_buffer_pos + 1;
-            return true;
-        } else {
-            return false;
-        }
-    }
-    return false;
 }
 
 bool pipeline_process_key(uint16_t keycode, abskeyevent_t abskeyevent) {

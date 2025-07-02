@@ -1,6 +1,6 @@
 #pragma once
 
-#include QMK_KEYBOARD_H
+#include "keyboard.h"
 
 typedef enum  {
   _LQWERTY,
