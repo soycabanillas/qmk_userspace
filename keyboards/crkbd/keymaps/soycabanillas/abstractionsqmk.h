@@ -1,13 +1,6 @@
 #pragma once
 
-#include "commons.h"
 #include "quantum_keycodes.h"
-
-#define KEYS_ARE_EQUAL(keya, keyb) ((keya).row == (keyb).row && (keya).col == (keyb).col)
-
-void print_buffer(uint8_t layer, abskeyevent_t keybuffer[8], uint8_t keybuffer_length);
-uint8_t get_layer_topdown(keypos_t key);
-bool flush_keybuffer_to_new_layer(uint8_t layer, keypos_t keyfromevent,abskeyevent_t keybuffer[8], uint8_t keybuffer_length);
 
 // Custom Keycode Declarations
 enum planck_keycodes {

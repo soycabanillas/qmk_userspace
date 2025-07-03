@@ -1,11 +1,10 @@
 SRC += platform_qmk_impl.c
-SRC += abstractionsqmk.c
 SRC += key_buffer.c
 SRC += pipeline_oneshot_modifier.c
 SRC += pipeline_key_replacer.c
 SRC += pipeline_tap_dance.c
 
-CONSOLE_ENABLE =  yes         # Disable debugging console
+CONSOLE_ENABLE =  no          # Disable debugging console
 DEFERRED_EXEC_ENABLE = yes    # Enable deferred execution (needed for your code)
 EXTRAKEY_ENABLE = no          # Disable extra keys (media, system, etc)
 COMMAND_ENABLE = no           # Disable runtime command interface

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "keyboard.h"
+#include "platform_qmk.h"
 
 typedef enum  {
   _LQWERTY,
@@ -29,7 +29,7 @@ typedef enum  {
 
 /* key event */
 typedef struct {
-    keypos_t key;
+    platform_keypos_t key;
     bool     pressed;
-    uint16_t time;
+    platform_time_t time;
 } abskeyevent_t;

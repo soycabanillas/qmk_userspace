@@ -1,9 +1,6 @@
-#include "action_layer.h"
 #include "commons.h"
-#include "deferred_exec.h"
 #include "abstractionsqmk.h"
 #include "platform_qmk.h"
-#include "quantum.h"
 #include "pipeline_tap_dance.h"
 #include <stdlib.h>
 #include <string.h>
@@ -70,56 +67,41 @@ typedef enum {
 } custom_key_event;
 
 typedef struct {
-    uint8_t count; //number of times the key has been tapped in a row (within a time span between each tap)
-
+    uint8_t count;
     bool hasholdaction : 1;
     bool haskeyaction : 1;
-
     uint8_t original_layer;
     uint8_t selected_layer;
-
     hold_or_tap_sequence hold_or_tap_sequence;
     hold_state hold_state;
-
     uint8_t press_buffer_pos;
     uint8_t keybuffer_length;
-    deferred_token hold_span_reached_token;
-
-    uint16_t selected_keycode;
-    deferred_token key_repetition_span_exceeded_token;
-
+    platform_deferred_token hold_span_reached_token;
+    platform_keycode_t selected_keycode;
+    platform_deferred_token key_repetition_span_exceeded_token;
     size_t actionslength;
     custom_action_custom_behaviour *actions[];
 } custom_switch_layer_custom_data;
 
-uint16_t lastKeyTapped = 0;
-uint16_t lastKeyTappedTime = 0;
-uint16_t lastKeyUntapped = 0;
-uint16_t lastKeyUntappedTime = 0;
+platform_keycode_t lastKeyTapped = 0;
+platform_time_t lastKeyTappedTime = 0;
+platform_keycode_t lastKeyUntapped = 0;
+platform_time_t lastKeyUntappedTime = 0;
 
 uint32_t hold_span_reached_timer(uint32_t trigger_time, void *cb_arg) {
-// #ifdef CONSOLE_ENABLE
-//   platform_log_debug("hold_span_reached_timer");
-// #endif
     custom_switch_layer_custom_data *status = (custom_switch_layer_custom_data*)cb_arg;
     status->hold_state = _HOLD_TRESHOLD_DETECTED;
     status->hold_or_tap_sequence = _HOLD;
-    layer_on(status->selected_layer);
+    platform_layer_on(status->selected_layer);
     status->hold_span_reached_token = 0;
-    // print_buffer(status->selected_layer, &press_buffer[status->press_buffer_pos], status->keybuffer_length);
     return 0;
 }
 
 uint32_t key_repetition_span_exceeded_timer(uint32_t trigger_time, void *cb_arg) {
-// #ifdef CONSOLE_ENABLE
-//   platform_log_debug("key_repetition_span_exceeded_timer");
-// #endif
     custom_switch_layer_custom_data *status = (custom_switch_layer_custom_data*)cb_arg;
     status->key_repetition_span_exceeded_token = 0;
     platform_log_debug("key_repetition_span_exceeded_timer - tap_code16_delay");
-    tap_code16_delay(status->selected_keycode, 10);
-    //tap_code16(status->selected_keycode);
-    // print_buffer(status->original_layer, &press_buffer[status->press_buffer_pos], status->keybuffer_length);
+    platform_tap_code_delay(status->selected_keycode, 10);
     return 0;
 }
 
@@ -161,7 +143,6 @@ bool is_there_actions_after(custom_switch_layer_custom_data* custom_switch_layer
 
 bool custom_switch_layer_custom_function (platform_keycode_t keycode, abskeyevent_t event, t_layer_status *status, void *user_data) {
     custom_switch_layer_custom_data *layer_status = (custom_switch_layer_custom_data *)user_data;
-    //platform_log_debug("keycode: %u, keycodemodifier: %u", keycode, status->keycodemodifier);
     if (layer_status->actionslength == 0) {
         platform_log_debug("cslcd - exit because actionslength == 0");
         return false;
@@ -176,16 +157,14 @@ bool custom_switch_layer_custom_function (platform_keycode_t keycode, abskeyeven
                 layer_status->count = 1;
             } else if (layer_status->hold_or_tap_sequence == _TAP) {
                 if (is_there_actions_after(layer_status, layer_status->count - 1) == true) {
-                    cancel_deferred_exec(layer_status->key_repetition_span_exceeded_token);
+                    platform_cancel_deferred_exec(layer_status->key_repetition_span_exceeded_token);
                     layer_status->key_repetition_span_exceeded_token = 0;
                     layer_status->count = layer_status->count + 1;
                 } else {
                     layer_status->count = 1;
                 }
             } else if (layer_status->hold_or_tap_sequence == _DECIDING) {
-                #ifdef CONSOLE_ENABLE
-                    uprintf("Invalid state: layer_status->hold_or_tap_sequence == _DECIDING\n");
-                #endif
+                platform_log_debug("Invalid state: layer_status->hold_or_tap_sequence == _DECIDING");
             }
             if (layer_status->count == 1) {
                 layer_status->original_layer = 0;//get_layer_topdown(event.key);
@@ -199,7 +178,7 @@ bool custom_switch_layer_custom_function (platform_keycode_t keycode, abskeyeven
                 layer_status->hasholdaction = true;
                 layer_status->selected_layer = hold_action->layer;
                 layer_status->keybuffer_length = 0;
-                layer_status->hold_span_reached_token = defer_exec(g_tap_timeout, hold_span_reached_timer, layer_status);
+                layer_status->hold_span_reached_token = platform_defer_exec(g_tap_timeout, hold_span_reached_timer, layer_status);
             } else {
                 layer_status->hasholdaction = false;
                 layer_status->selected_layer = 0;
@@ -214,10 +193,10 @@ bool custom_switch_layer_custom_function (platform_keycode_t keycode, abskeyeven
                 layer_status->haskeyaction = false;
                 layer_status->selected_keycode = 0;
             }
-            uprintf("cslcd - pressed  : count: %u, hasholdaction: %u, haskeyaction %u, g_tap_timeout %u\n", layer_status->count, layer_status->hasholdaction, layer_status->haskeyaction, g_tap_timeout);
+            platform_log_debug("cslcd - pressed  : count: %u, hasholdaction: %u, haskeyaction %u, g_tap_timeout %u", layer_status->count, layer_status->hasholdaction, layer_status->haskeyaction, g_tap_timeout);
         } else {
             if (layer_status->hold_state == _DURING_HOLD_DECISION) {
-                cancel_deferred_exec(layer_status->hold_span_reached_token);
+                platform_cancel_deferred_exec(layer_status->hold_span_reached_token);
                 layer_status->hold_span_reached_token = 0;
 
                 if (layer_status->haskeyaction) {
@@ -226,7 +205,7 @@ bool custom_switch_layer_custom_function (platform_keycode_t keycode, abskeyeven
                     layer_status->hold_or_tap_sequence = _NONE;
                 }
             } else if (layer_status->hold_state == _HOLD_TRESHOLD_DETECTED) {
-                layer_off(layer_status->selected_layer);
+                platform_layer_off(layer_status->selected_layer);
                 platform_clear_keyboard();
                 // The value of layer_status->hold_or_tap_sequence has been set on the deferred execution to _HOLD
             } else if (layer_status->haskeyaction) {
@@ -236,10 +215,9 @@ bool custom_switch_layer_custom_function (platform_keycode_t keycode, abskeyeven
             }
 
             if (layer_status->hold_or_tap_sequence == _TAP && is_there_actions_after(layer_status, layer_status->count - 1) == true) {
-                // print_buffer(status->selected_layer, &press_buffer[status->press_buffer_pos], status->keybuffer_length);
-                layer_status->key_repetition_span_exceeded_token = defer_exec(g_tap_timeout, key_repetition_span_exceeded_timer, status);
+                layer_status->key_repetition_span_exceeded_token = platform_defer_exec(g_tap_timeout, key_repetition_span_exceeded_timer, status);
             }
-            uprintf("cslcd - unpressed: count: %u, hasholdaction: %u, haskeyaction: %u, selected_keycode: %u\n", layer_status->count, layer_status->hasholdaction, layer_status->haskeyaction, layer_status->selected_keycode);
+            platform_log_debug("cslcd - unpressed: count: %u, hasholdaction: %u, haskeyaction: %u, selected_keycode: %u", layer_status->count, layer_status->hasholdaction, layer_status->haskeyaction, layer_status->selected_keycode);
         }
         return false;
     } else {
@@ -256,7 +234,7 @@ bool custom_switch_layer_custom_function (platform_keycode_t keycode, abskeyeven
             //decide_over_keypressed(keycode, layer_status, false);
         } else if (layer_status->hold_or_tap_sequence == _TAP) {
             if (is_there_actions_after(layer_status, layer_status->count - 1) == true) {
-                cancel_deferred_exec(layer_status->key_repetition_span_exceeded_token);
+                platform_cancel_deferred_exec(layer_status->key_repetition_span_exceeded_token);
                 layer_status->key_repetition_span_exceeded_token = 0;
             }
             layer_status->hold_or_tap_sequence = _HOLD_OR_TAP_STATE_NOT_SET;
@@ -265,7 +243,7 @@ bool custom_switch_layer_custom_function (platform_keycode_t keycode, abskeyeven
     return true;
 }
 
-custom_action_custom_behaviour* createbehaviouraction(uint8_t repetitions, td_customlayer_action_t action, uint16_t keycode, uint8_t layer) {
+custom_action_custom_behaviour* createbehaviouraction(uint8_t repetitions, td_customlayer_action_t action, platform_keycode_t keycode, uint8_t layer) {
     custom_action_custom_behaviour behaviouraction = {
         .repetitions = repetitions,
         .action = action,

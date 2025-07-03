@@ -66,70 +66,70 @@ void pipeline_oneshot_modifier_callback(pipeline_callback_params_t* params, pipe
         if (data->modifiers != 0 && params->keycode <= 0xFF && params->up == true && params->callback_type == PIPELINE_CALLBACK_KEY_PRESS) {
             if (data->modifiers & MACRO_KEY_MODIFIER_LEFT_SHIFT) {
                 platform_register_code(KC_LEFT_SHIFT);
-                wait_ms(10);
+                platform_wait_ms(10);
             }
             if (data->modifiers & MACRO_KEY_MODIFIER_RIGHT_SHIFT) {
                 platform_register_code(KC_RIGHT_SHIFT);
-                wait_ms(10);
+                platform_wait_ms(10);
             }
             if (data->modifiers & MACRO_KEY_MODIFIER_LEFT_CTRL) {
                 platform_register_code(KC_LEFT_CTRL);
-                wait_ms(10);
+                platform_wait_ms(10);
             }
             if (data->modifiers & MACRO_KEY_MODIFIER_RIGHT_CTRL) {
                 platform_register_code(KC_RIGHT_CTRL);
-                wait_ms(10);
+                platform_wait_ms(10);
             }
             if (data->modifiers & MACRO_KEY_MODIFIER_LEFT_ALT) {
                 platform_register_code(KC_LEFT_ALT);
-                wait_ms(10);
+                platform_wait_ms(10);
             }
             if (data->modifiers & MACRO_KEY_MODIFIER_RIGHT_ALT) {
                 platform_register_code(KC_RIGHT_ALT);
-                wait_ms(10);
+                platform_wait_ms(10);
             }
             if (data->modifiers & MACRO_KEY_MODIFIER_LEFT_GUI) {
                 platform_register_code(KC_LEFT_GUI);
-                wait_ms(10);
+                platform_wait_ms(10);
             }
             if (data->modifiers & MACRO_KEY_MODIFIER_RIGHT_GUI) {
                 platform_register_code(KC_RIGHT_GUI);
-                wait_ms(10);
+                platform_wait_ms(10);
             }
             data->executed_on_up = true;
         }
         else if (params->up == false && data->executed_on_up == true) {
             if (data->modifiers & MACRO_KEY_MODIFIER_LEFT_SHIFT) {
                 platform_unregister_code(KC_LEFT_SHIFT);
-                wait_ms(10);
+                platform_wait_ms(10);
             }
             if (data->modifiers & MACRO_KEY_MODIFIER_RIGHT_SHIFT) {
                 platform_unregister_code(KC_RIGHT_SHIFT);
-                wait_ms(10);
+                platform_wait_ms(10);
             }
             if (data->modifiers & MACRO_KEY_MODIFIER_LEFT_CTRL) {
                 platform_unregister_code(KC_LEFT_CTRL);
-                wait_ms(10);
+                platform_wait_ms(10);
             }
             if (data->modifiers & MACRO_KEY_MODIFIER_RIGHT_CTRL) {
                 platform_unregister_code(KC_RIGHT_CTRL);
-                wait_ms(10);
+                platform_wait_ms(10);
             }
             if (data->modifiers & MACRO_KEY_MODIFIER_LEFT_ALT) {
                 platform_unregister_code(KC_LEFT_ALT);
-                wait_ms(10);
+                platform_wait_ms(10);
             }
             if (data->modifiers & MACRO_KEY_MODIFIER_RIGHT_ALT) {
                 platform_unregister_code(KC_RIGHT_ALT);
-                wait_ms(10);
+                platform_wait_ms(10);
             }
             if (data->modifiers & MACRO_KEY_MODIFIER_LEFT_GUI) {
                 platform_unregister_code(KC_LEFT_GUI);
-                wait_ms(10);
+                platform_wait_ms(10);
             }
             if (data->modifiers & MACRO_KEY_MODIFIER_RIGHT_GUI) {
                 platform_unregister_code(KC_RIGHT_GUI);
-                wait_ms(10);
+                platform_wait_ms(10);
             }
             data->modifiers = 0;
             data->executed_on_up = false;

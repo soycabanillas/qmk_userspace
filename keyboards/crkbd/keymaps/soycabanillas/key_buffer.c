@@ -1,5 +1,4 @@
 #include "key_buffer.h"
-#include "keymap_common.h"
 #include "platform_qmk.h"
 #include <stdlib.h>
 #include <string.h>
@@ -174,21 +173,13 @@ bool process_key_pool(void) {
         }
 
         if (press_buffer_selected->keycode <= 0xFF) {
-            platform_log_debug("basic_key 0x%04X", press_buffer_selected->keycode);
-            // keypos_t key = {
-            //     .col = press_buffer_selected->key.col,
-            //     .row = press_buffer_selected->key.row
-            // };
-            // uint16_t fallthrough = keymap_key_to_keycode(10, key);
-            platform_keycode_t fallthrough2 = keymap_key_to_keycode(0, press_buffer[0].key);
-            platform_log_debug("SHOULD BE : 0x%04X", fallthrough2);
             platform_keycode_t fallthrough = press_buffer_selected->keycode;
             if (press_buffer[0].is_press == true) {
                 platform_register_code(fallthrough);
-                wait_ms(10);
+                platform_wait_ms(10);
             } else {
                 platform_unregister_code(fallthrough);
-                wait_ms(10);
+                platform_wait_ms(10);
             }
             further_process_required = false;
         }
