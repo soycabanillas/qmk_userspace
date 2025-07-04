@@ -1,4 +1,3 @@
-#include "commons.h"
 #include "abstractionsqmk.h"
 #include "key_buffer.h"
 #include "platform_qmk.h"
@@ -93,7 +92,7 @@ void* pipeline_key_replacer_initialize_user_data(void) {
 }
 
 void pipeline_key_replacer_callback(pipeline_callback_params_t* params, pipeline_config_t* config, void* user_data) {
-    platform_log_debug("pipeline_key_replacer_callback || up: %u || press: %u", params->up, params->callback_type);
+    //platform_log_debug("pipeline_key_replacer_callback || up: %u || press: %u", params->up, params->callback_type);
     pipeline_key_replacer_global_t* data = (pipeline_key_replacer_global_t*)user_data;
     if (params->up == true && params->callback_type == PIPELINE_CALLBACK_KEY_PRESS) {
         for (size_t i = 0; i < data->pairs->length; i++)
@@ -107,35 +106,35 @@ void pipeline_key_replacer_callback(pipeline_callback_params_t* params, pipeline
                     .modifiers = 0
                 };
                 data->pairs->modifier_pairs[i]->callback(&input, &result);
-                if (result.modifiers & MACRO_KEY_MODIFIER_LEFT_SHIFT && params->info.is_pressed(KC_LEFT_SHIFT) == false) {
+                if (result.modifiers & MACRO_KEY_MODIFIER_LEFT_SHIFT && params->info.is_pressed_fn(KC_LEFT_SHIFT) == false) {
                     platform_register_code(KC_LEFT_SHIFT);
                     platform_wait_ms(10);
                 }
-                if (result.modifiers & MACRO_KEY_MODIFIER_RIGHT_SHIFT && params->info.is_pressed(KC_RIGHT_SHIFT) == false) {
+                if (result.modifiers & MACRO_KEY_MODIFIER_RIGHT_SHIFT && params->info.is_pressed_fn(KC_RIGHT_SHIFT) == false) {
                     platform_register_code(KC_RIGHT_SHIFT);
                     platform_wait_ms(10);
                 }
-                if (result.modifiers & MACRO_KEY_MODIFIER_LEFT_CTRL && params->info.is_pressed(KC_LEFT_CTRL) == false) {
+                if (result.modifiers & MACRO_KEY_MODIFIER_LEFT_CTRL && params->info.is_pressed_fn(KC_LEFT_CTRL) == false) {
                     platform_register_code(KC_LEFT_CTRL);
                     platform_wait_ms(10);
                 }
-                if (result.modifiers & MACRO_KEY_MODIFIER_RIGHT_CTRL && params->info.is_pressed(KC_RIGHT_CTRL) == false) {
+                if (result.modifiers & MACRO_KEY_MODIFIER_RIGHT_CTRL && params->info.is_pressed_fn(KC_RIGHT_CTRL) == false) {
                     platform_register_code(KC_RIGHT_CTRL);
                     platform_wait_ms(10);
                 }
-                if (result.modifiers & MACRO_KEY_MODIFIER_LEFT_ALT && params->info.is_pressed(KC_LEFT_ALT) == false) {
+                if (result.modifiers & MACRO_KEY_MODIFIER_LEFT_ALT && params->info.is_pressed_fn(KC_LEFT_ALT) == false) {
                     platform_register_code(KC_LEFT_ALT);
                     platform_wait_ms(10);
                 }
-                if (result.modifiers & MACRO_KEY_MODIFIER_RIGHT_ALT && params->info.is_pressed(KC_RIGHT_ALT) == false) {
+                if (result.modifiers & MACRO_KEY_MODIFIER_RIGHT_ALT && params->info.is_pressed_fn(KC_RIGHT_ALT) == false) {
                     platform_register_code(KC_RIGHT_ALT);
                     platform_wait_ms(10);
                 }
-                if (result.modifiers & MACRO_KEY_MODIFIER_LEFT_GUI && params->info.is_pressed(KC_LEFT_GUI) == false) {
+                if (result.modifiers & MACRO_KEY_MODIFIER_LEFT_GUI && params->info.is_pressed_fn(KC_LEFT_GUI) == false) {
                     platform_register_code(KC_LEFT_GUI);
                     platform_wait_ms(10);
                 }
-                if (result.modifiers & MACRO_KEY_MODIFIER_RIGHT_GUI && params->info.is_pressed(KC_RIGHT_GUI) == false) {
+                if (result.modifiers & MACRO_KEY_MODIFIER_RIGHT_GUI && params->info.is_pressed_fn(KC_RIGHT_GUI) == false) {
                     platform_register_code(KC_RIGHT_GUI);
                     platform_wait_ms(10);
                 }
@@ -158,35 +157,35 @@ void pipeline_key_replacer_callback(pipeline_callback_params_t* params, pipeline
                 };
                 data->pairs->modifier_pairs[i]->callback(&input, &result);
                 platform_unregister_code(result.keycode);
-                if (result.modifiers & MACRO_KEY_MODIFIER_LEFT_SHIFT && params->info.is_pressed(KC_LEFT_SHIFT) == false) {
+                if (result.modifiers & MACRO_KEY_MODIFIER_LEFT_SHIFT && params->info.is_pressed_fn(KC_LEFT_SHIFT) == false) {
                     platform_unregister_code(KC_LEFT_SHIFT);
                     platform_wait_ms(10);
                 }
-                if (result.modifiers & MACRO_KEY_MODIFIER_RIGHT_SHIFT && params->info.is_pressed(KC_RIGHT_SHIFT) == false) {
+                if (result.modifiers & MACRO_KEY_MODIFIER_RIGHT_SHIFT && params->info.is_pressed_fn(KC_RIGHT_SHIFT) == false) {
                     platform_unregister_code(KC_RIGHT_SHIFT);
                     platform_wait_ms(10);
                 }
-                if (result.modifiers & MACRO_KEY_MODIFIER_LEFT_CTRL && params->info.is_pressed(KC_LEFT_CTRL) == false) {
+                if (result.modifiers & MACRO_KEY_MODIFIER_LEFT_CTRL && params->info.is_pressed_fn(KC_LEFT_CTRL) == false) {
                     platform_unregister_code(KC_LEFT_CTRL);
                     platform_wait_ms(10);
                 }
-                if (result.modifiers & MACRO_KEY_MODIFIER_RIGHT_CTRL && params->info.is_pressed(KC_RIGHT_CTRL) == false) {
+                if (result.modifiers & MACRO_KEY_MODIFIER_RIGHT_CTRL && params->info.is_pressed_fn(KC_RIGHT_CTRL) == false) {
                     platform_unregister_code(KC_RIGHT_CTRL);
                     platform_wait_ms(10);
                 }
-                if (result.modifiers & MACRO_KEY_MODIFIER_LEFT_ALT && params->info.is_pressed(KC_LEFT_ALT) == false) {
+                if (result.modifiers & MACRO_KEY_MODIFIER_LEFT_ALT && params->info.is_pressed_fn(KC_LEFT_ALT) == false) {
                     platform_unregister_code(KC_LEFT_ALT);
                     platform_wait_ms(10);
                 }
-                if (result.modifiers & MACRO_KEY_MODIFIER_RIGHT_ALT && params->info.is_pressed(KC_RIGHT_ALT) == false) {
+                if (result.modifiers & MACRO_KEY_MODIFIER_RIGHT_ALT && params->info.is_pressed_fn(KC_RIGHT_ALT) == false) {
                     platform_unregister_code(KC_RIGHT_ALT);
                     platform_wait_ms(10);
                 }
-                if (result.modifiers & MACRO_KEY_MODIFIER_LEFT_GUI && params->info.is_pressed(KC_LEFT_GUI) == false) {
+                if (result.modifiers & MACRO_KEY_MODIFIER_LEFT_GUI && params->info.is_pressed_fn(KC_LEFT_GUI) == false) {
                     platform_unregister_code(KC_LEFT_GUI);
                     platform_wait_ms(10);
                 }
-                if (result.modifiers & MACRO_KEY_MODIFIER_RIGHT_GUI && params->info.is_pressed(KC_RIGHT_GUI) == false) {
+                if (result.modifiers & MACRO_KEY_MODIFIER_RIGHT_GUI && params->info.is_pressed_fn(KC_RIGHT_GUI) == false) {
                     platform_unregister_code(KC_RIGHT_GUI);
                     platform_wait_ms(10);
                 }

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <stddef.h>
-#include "commons.h"
 #include "platform_qmk.h"
 
 // typedef bool (*is_pressed)(platform_keycode_t);
@@ -16,7 +15,7 @@ typedef enum {
 typedef bool (*is_pressed)(platform_keycode_t);
 
 typedef struct {
-    is_pressed is_pressed;
+    is_pressed is_pressed_fn;
 } pipeline_info_t;
 
 typedef struct {

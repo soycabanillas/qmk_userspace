@@ -42,20 +42,20 @@ bool info_is_pressed(platform_keycode_t keycode){
 void print_press_buffers(int16_t num_keys) {
     uint8_t num_keys_to_print = num_keys;
     if (num_keys_to_print > ONLY_PRESS_BUFFER_MAX) num_keys_to_print = ONLY_PRESS_BUFFER_MAX;
-    platform_log_debug("-only -  pos: %2u || ", only_press_buffer_pos);
+    // platform_log_debug("-only -  pos: %2u || ", only_press_buffer_pos);
     for (size_t i = 0; i < num_keys_to_print; i++)
     {
-        platform_log_debug("col: %3u row: %2u key:0x%04X || ", only_press_buffer[i].key.col, only_press_buffer[i].key.row, only_press_buffer[i].keycode);
+        // platform_log_debug("col: %3u row: %2u key:0x%04X || ", only_press_buffer[i].key.col, only_press_buffer[i].key.row, only_press_buffer[i].keycode);
     }
-    platform_log_debug("");
+    // platform_log_debug("");
 
     if (num_keys_to_print > PRESS_BUFFER_MAX) num_keys_to_print = PRESS_BUFFER_MAX;
-    platform_log_debug("-press-  pos: %2u || ", press_buffer_pos);
+    // platform_log_debug("-press-  pos: %2u || ", press_buffer_pos);
     for (size_t i = 0; i < num_keys_to_print; i++)
     {
-        platform_log_debug("col: %3u row: %2u key:0x%04X || ", press_buffer[i].key.col, press_buffer[i].key.row, press_buffer[i].keycode);
+        // platform_log_debug("col: %3u row: %2u key:0x%04X || ", press_buffer[i].key.col, press_buffer[i].key.row, press_buffer[i].keycode);
     }
-    platform_log_debug("");
+    // platform_log_debug("");
 }
 
 // Add the key press or release to the press_buffer buffer.
@@ -149,7 +149,7 @@ void execute_pipeline(bool up, uint16_t callback_time, uint8_t macro_buffer_pos,
         } else {
             callback_params.callback_type = PIPELINE_CALLBACK_KEY_RELEASE;
         }
-        callback_params.info.is_pressed = &info_is_pressed;
+        callback_params.info.is_pressed_fn = &info_is_pressed;
     } else {
         callback_params.callback_type = PIPELINE_CALLBACK_TIMER;
     }
@@ -191,7 +191,7 @@ bool process_key_pool(void) {
 
         remove_from_press_buffer(0);
     }
-    print_press_buffers(10);
+    // print_press_buffers(10);
     return further_process_required;
 }
 

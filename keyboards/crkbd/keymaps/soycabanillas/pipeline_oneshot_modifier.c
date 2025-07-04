@@ -1,6 +1,6 @@
-#include "commons.h"
 #include "abstractionsqmk.h"
 #include "key_buffer.h"
+#include "keycodes.h"
 #include "platform_qmk.h"
 #include "pipeline_oneshot_modifier.h"
 #include <stdlib.h>
@@ -49,7 +49,7 @@ void* pipeline_oneshot_modifier_initialize_user_data(void) {
 }
 
 void pipeline_oneshot_modifier_callback(pipeline_callback_params_t* params, pipeline_config_t* config, void* user_data) {
-    platform_log_debug("pipeline_oneshot_modifier_callback || up: %u || press: %u", params->up, params->callback_type);
+    // platform_log_debug("pipeline_oneshot_modifier_callback || up: %u || press: %u", params->up, params->callback_type);
     pipeline_oneshot_modifier_global_t* data = (pipeline_oneshot_modifier_global_t*)user_data;
     bool found_modifier = false;
     if (params->up == true && params->callback_type == PIPELINE_CALLBACK_KEY_PRESS) {

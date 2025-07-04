@@ -1,12 +1,21 @@
+#include "platform_qmk.h"
+
+#ifdef PLATFORM_QMK
 #include "_wait.h"
 #include "action.h"
 #include "action_layer.h"
 #include "action_util.h"
 #include "deferred_exec.h"
-#include "platform_qmk.h"
 #include "quantum.h"
 #include "timer.h"
+#elif defined(PLATFORM_TEST)
+// For test environment, we rely on the mock definitions
+// All the necessary function definitions will be mocked
+#include <stdint.h>
+#include <stdbool.h>
+#endif
 
+#ifdef PLATFORM_QMK
 // Timer implementations
 platform_time_t platform_timer_read(void) {
     return timer_read();
@@ -31,10 +40,6 @@ void platform_tap_code(platform_keycode_t keycode) {
 
 void platform_tap_code_delay(platform_keycode_t keycode, uint8_t delay) {
     tap_code16_delay(keycode, delay);
-}
-
-bool platform_is_key_pressed(platform_keyrecord_t *record) {
-    return record->event.pressed;
 }
 
 void platform_add_key(platform_keycode_t keycode) {
@@ -94,4 +99,6 @@ platform_deferred_token platform_defer_exec(uint32_t delay_ms, platform_deferred
 void platform_cancel_deferred_exec(platform_deferred_token token) {
     cancel_deferred_exec(token);
 }
+
+#endif // PLATFORM_QMK
 

@@ -1,7 +1,14 @@
+#ifdef UNIT_TEST
+    // Test environment includes
+    #include "key_buffer.h"
+    #include "test_keycodes.h"
+#else
+    // Production environment includes
+    #include "pipeline_tap_dance.h"
+#endif
 #include "commons.h"
 #include "abstractionsqmk.h"
 #include "platform_qmk.h"
-#include "pipeline_tap_dance.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -39,7 +46,13 @@ typedef struct {
     custom_behaviour_config *layers[];
 } custom_layers_struct;
 
+#ifdef UNIT_TEST
+// In test environment, custom_layers is defined in the test mock (qmk_test_mock.cpp)
+extern custom_layers_struct *custom_layers;
+#else
+// In normal QMK environment, define it here
 custom_layers_struct *custom_layers;
+#endif
 
 // --------------------------
 typedef enum {
@@ -72,8 +85,8 @@ typedef struct {
     bool haskeyaction : 1;
     uint8_t original_layer;
     uint8_t selected_layer;
-    hold_or_tap_sequence hold_or_tap_sequence;
-    hold_state hold_state;
+    hold_or_tap_sequence sequence;
+    hold_state state;
     uint8_t press_buffer_pos;
     uint8_t keybuffer_length;
     platform_deferred_token hold_span_reached_token;
@@ -88,10 +101,13 @@ platform_time_t lastKeyTappedTime = 0;
 platform_keycode_t lastKeyUntapped = 0;
 platform_time_t lastKeyUntappedTime = 0;
 
+// Forward declarations
+custom_action_custom_behaviour* get_action_tap_key_sendkey(uint8_t repetitions, custom_switch_layer_custom_data* custom_switch_layer_custom_data);
+
 uint32_t hold_span_reached_timer(uint32_t trigger_time, void *cb_arg) {
     custom_switch_layer_custom_data *status = (custom_switch_layer_custom_data*)cb_arg;
-    status->hold_state = _HOLD_TRESHOLD_DETECTED;
-    status->hold_or_tap_sequence = _HOLD;
+    status->state = _HOLD_TRESHOLD_DETECTED;
+    status->sequence = _HOLD;
     platform_layer_on(status->selected_layer);
     status->hold_span_reached_token = 0;
     return 0;
@@ -100,7 +116,7 @@ uint32_t hold_span_reached_timer(uint32_t trigger_time, void *cb_arg) {
 uint32_t key_repetition_span_exceeded_timer(uint32_t trigger_time, void *cb_arg) {
     custom_switch_layer_custom_data *status = (custom_switch_layer_custom_data*)cb_arg;
     status->key_repetition_span_exceeded_token = 0;
-    platform_log_debug("key_repetition_span_exceeded_timer - tap_code16_delay");
+    // platform_log_debug("key_repetition_span_exceeded_timer - tap_code16_delay");
     platform_tap_code_delay(status->selected_keycode, 10);
     return 0;
 }
@@ -144,18 +160,18 @@ bool is_there_actions_after(custom_switch_layer_custom_data* custom_switch_layer
 bool custom_switch_layer_custom_function (platform_keycode_t keycode, abskeyevent_t event, t_layer_status *status, void *user_data) {
     custom_switch_layer_custom_data *layer_status = (custom_switch_layer_custom_data *)user_data;
     if (layer_status->actionslength == 0) {
-        platform_log_debug("cslcd - exit because actionslength == 0");
+        //platform_log_debug("cslcd - exit because actionslength == 0");
         return false;
     }
     if (keycode == (status->keycodemodifier)) {
         if (event.pressed) {
-            layer_status->hold_state = _HOLD_STATE_NOT_SET;
+            layer_status->state = _HOLD_STATE_NOT_SET;
 
-            if (layer_status->hold_or_tap_sequence == _HOLD_OR_TAP_STATE_NOT_SET || layer_status->hold_or_tap_sequence == _NONE) {
+            if (layer_status->sequence == _HOLD_OR_TAP_STATE_NOT_SET || layer_status->sequence == _NONE) {
                 layer_status->count = 1;
-            } else if (layer_status->hold_or_tap_sequence == _HOLD) {
+            } else if (layer_status->sequence == _HOLD) {
                 layer_status->count = 1;
-            } else if (layer_status->hold_or_tap_sequence == _TAP) {
+            } else if (layer_status->sequence == _TAP) {
                 if (is_there_actions_after(layer_status, layer_status->count - 1) == true) {
                     platform_cancel_deferred_exec(layer_status->key_repetition_span_exceeded_token);
                     layer_status->key_repetition_span_exceeded_token = 0;
@@ -163,17 +179,17 @@ bool custom_switch_layer_custom_function (platform_keycode_t keycode, abskeyeven
                 } else {
                     layer_status->count = 1;
                 }
-            } else if (layer_status->hold_or_tap_sequence == _DECIDING) {
-                platform_log_debug("Invalid state: layer_status->hold_or_tap_sequence == _DECIDING");
+            } else if (layer_status->sequence == _DECIDING) {
+                //platform_log_debug("Invalid state: layer_status->hold_or_tap_sequence == _DECIDING");
             }
             if (layer_status->count == 1) {
                 layer_status->original_layer = 0;//get_layer_topdown(event.key);
             }
-            layer_status->hold_or_tap_sequence = _DECIDING;
+            layer_status->sequence = _DECIDING;
 
             custom_action_custom_behaviour* hold_action = get_action_hold_key_changelayertempo(layer_status->count - 1, layer_status);
             if (hold_action != NULL) {
-                layer_status->hold_state = _DURING_HOLD_DECISION;
+                layer_status->state = _DURING_HOLD_DECISION;
 
                 layer_status->hasholdaction = true;
                 layer_status->selected_layer = hold_action->layer;
@@ -193,35 +209,35 @@ bool custom_switch_layer_custom_function (platform_keycode_t keycode, abskeyeven
                 layer_status->haskeyaction = false;
                 layer_status->selected_keycode = 0;
             }
-            platform_log_debug("cslcd - pressed  : count: %u, hasholdaction: %u, haskeyaction %u, g_tap_timeout %u", layer_status->count, layer_status->hasholdaction, layer_status->haskeyaction, g_tap_timeout);
+            // platform_log_debug("cslcd - pressed  : count: %u, hasholdaction: %u, haskeyaction %u, g_tap_timeout %u", layer_status->count, layer_status->hasholdaction, layer_status->haskeyaction, g_tap_timeout);
         } else {
-            if (layer_status->hold_state == _DURING_HOLD_DECISION) {
+            if (layer_status->state == _DURING_HOLD_DECISION) {
                 platform_cancel_deferred_exec(layer_status->hold_span_reached_token);
                 layer_status->hold_span_reached_token = 0;
 
                 if (layer_status->haskeyaction) {
-                    layer_status->hold_or_tap_sequence = _TAP;
+                    layer_status->sequence = _TAP;
                 } else {
-                    layer_status->hold_or_tap_sequence = _NONE;
+                    layer_status->sequence = _NONE;
                 }
-            } else if (layer_status->hold_state == _HOLD_TRESHOLD_DETECTED) {
+            } else if (layer_status->state == _HOLD_TRESHOLD_DETECTED) {
                 platform_layer_off(layer_status->selected_layer);
                 platform_clear_keyboard();
-                // The value of layer_status->hold_or_tap_sequence has been set on the deferred execution to _HOLD
+                // The value of layer_status->sequence has been set on the deferred execution to _HOLD
             } else if (layer_status->haskeyaction) {
-                layer_status->hold_or_tap_sequence = _TAP;
+                layer_status->sequence = _TAP;
             } else {
-                layer_status->hold_or_tap_sequence = _NONE;
+                layer_status->sequence = _NONE;
             }
 
-            if (layer_status->hold_or_tap_sequence == _TAP && is_there_actions_after(layer_status, layer_status->count - 1) == true) {
-                layer_status->key_repetition_span_exceeded_token = platform_defer_exec(g_tap_timeout, key_repetition_span_exceeded_timer, status);
+            if (layer_status->sequence == _TAP && is_there_actions_after(layer_status, layer_status->count - 1) == true) {
+                layer_status->key_repetition_span_exceeded_token = platform_defer_exec(g_tap_timeout, key_repetition_span_exceeded_timer, layer_status);
             }
-            platform_log_debug("cslcd - unpressed: count: %u, hasholdaction: %u, haskeyaction: %u, selected_keycode: %u", layer_status->count, layer_status->hasholdaction, layer_status->haskeyaction, layer_status->selected_keycode);
+            //platform_log_debug("cslcd - unpressed: count: %u, hasholdaction: %u, haskeyaction: %u, selected_keycode: %u", layer_status->count, layer_status->hasholdaction, layer_status->haskeyaction, layer_status->selected_keycode);
         }
         return false;
     } else {
-        if (layer_status->hold_or_tap_sequence == _DECIDING) {
+        if (layer_status->sequence == _DECIDING) {
             // if (layer_status->keybuffer_length < 8)
             // {
             //     layer_status->keybuffer[layer_status->keybuffer_length].key = event.key;
@@ -230,14 +246,14 @@ bool custom_switch_layer_custom_function (platform_keycode_t keycode, abskeyeven
             //     layer_status->keybuffer_length += 1;
             // }
             return false;
-        } else if (layer_status->hold_or_tap_sequence == _HOLD) {
+        } else if (layer_status->sequence == _HOLD) {
             //decide_over_keypressed(keycode, layer_status, false);
-        } else if (layer_status->hold_or_tap_sequence == _TAP) {
+        } else if (layer_status->sequence == _TAP) {
             if (is_there_actions_after(layer_status, layer_status->count - 1) == true) {
                 platform_cancel_deferred_exec(layer_status->key_repetition_span_exceeded_token);
                 layer_status->key_repetition_span_exceeded_token = 0;
             }
-            layer_status->hold_or_tap_sequence = _HOLD_OR_TAP_STATE_NOT_SET;
+            layer_status->sequence = _HOLD_OR_TAP_STATE_NOT_SET;
         }
     }
     return true;
@@ -250,17 +266,17 @@ custom_action_custom_behaviour* createbehaviouraction(uint8_t repetitions, td_cu
         .keycode = keycode,
         .layer = layer,
     };
-    custom_action_custom_behaviour* allocation = malloc(sizeof behaviouraction);
+    custom_action_custom_behaviour* allocation = (custom_action_custom_behaviour*)malloc(sizeof behaviouraction);
     memcpy(allocation, &behaviouraction, sizeof behaviouraction);
     return allocation;
 }
 
 custom_behaviour_config* createbehaviour(platform_keycode_t keycodemodifier, custom_action_custom_behaviour* actions[], size_t actionslength) {
     custom_switch_layer_custom_data userdata = {
-        .hold_or_tap_sequence = _HOLD_OR_TAP_STATE_NOT_SET
+        .sequence = _HOLD_OR_TAP_STATE_NOT_SET
     };
     userdata.actionslength = actionslength;
-    custom_switch_layer_custom_data* allocationuserdata = malloc(sizeof(custom_switch_layer_custom_data) + actionslength * sizeof (custom_action_custom_behaviour*));
+    custom_switch_layer_custom_data* allocationuserdata = (custom_switch_layer_custom_data*)malloc(sizeof(custom_switch_layer_custom_data) + actionslength * sizeof (custom_action_custom_behaviour*));
     memcpy(allocationuserdata, &userdata, sizeof userdata);
     for (size_t i = 0; i < actionslength; i++)
     {
@@ -273,10 +289,14 @@ custom_behaviour_config* createbehaviour(platform_keycode_t keycodemodifier, cus
         .user_data = (void*) allocationuserdata,
         .callback = &custom_switch_layer_custom_function
     };
-    custom_behaviour_config* allocation = malloc(sizeof behaviour);
+    custom_behaviour_config* allocation = (custom_behaviour_config*)malloc(sizeof behaviour);
     memcpy(allocation, &behaviour, sizeof behaviour);
     return allocation;
 }
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 bool macros_process_key(platform_keycode_t keycode, abskeyevent_t abskeyevent) {
     if (abskeyevent.pressed) {
@@ -295,14 +315,16 @@ bool macros_process_key(platform_keycode_t keycode, abskeyevent_t abskeyevent) {
         //platform_log_debug("custom_layers_length: %u, keycodemodifier: %u", custom_layers->length, custom_layers->layers[i]->status.keycodemodifier);
         custom_behaviour_config *layer_status = custom_layers->layers[i];
         //platform_log_debug("keycodemodifier: %u", layer_status->status.keycodemodifier);
-        if (layer_status->callback(keycode, abskeyevent, &layer_status->status, layer_status->user_data) == false) return false;
+        if (layer_status->callback(keycode, abskeyevent, &layer_status->status, layer_status->user_data) == false) {
+            return false;
+        }
     }
     return true;
 }
 
 void* pipeline_tap_dance_initialize_user_data(void) {
     size_t nelements = 6;
-    custom_layers = malloc(sizeof *custom_layers + nelements * sizeof *custom_layers->layers);
+    custom_layers = (custom_layers_struct*)malloc(sizeof *custom_layers + nelements * sizeof *custom_layers->layers);
     custom_layers->length = nelements;
 
     custom_action_custom_behaviour* custom_actions[] =
@@ -378,3 +400,7 @@ void pipeline_tap_dance_callback(pipeline_callback_params_t* params, pipeline_co
     //     }
     // }
 }
+
+#ifdef __cplusplus
+}
+#endif

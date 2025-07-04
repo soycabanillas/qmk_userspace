@@ -1,14 +1,16 @@
 #include "gtest/gtest.h"
-#include "gmock/gmock.h"
+#include "qmk_test_mock.h"
 
 extern "C" {
-#include "mock_qmk.h"
-#include "pipeline_tap_dance.h"
+#include "test_keycodes.h"
+#include "abstractionsqmk.h"
 #include "commons.h"
 }
 
 class TapDanceInterruptionTest : public ::testing::Test {
 protected:
+    custom_layers_struct* custom_layers;
+
     void SetUp() override {
         reset_mock_state();
         custom_layers = (custom_layers_struct*)pipeline_tap_dance_initialize_user_data();
@@ -35,7 +37,7 @@ protected:
         };
 
         if (time_offset > 0) {
-            advance_time(time_offset);
+            wait_ms(time_offset);
         }
 
         macros_process_key(keycode, event);
@@ -44,18 +46,18 @@ protected:
 
 // Test interruption during hold decision period
 TEST_F(TapDanceInterruptionTest, InterruptionDuringHoldDecision) {
-    g_mock_state.layer_on_calls = 0;
-    g_mock_state.tap_code_calls = 0;
+    g_mock_state.layer_on_calls.clear();
+    g_mock_state.tap_code_calls.clear();
 
     // Start hold decision
     simulate_key_event(CKC_LAY_MOUSE_Q, true);
 
     // Interrupt with another key before timeout
-    advance_time(100);
+    wait_ms(100);
     simulate_key_event(KC_Q, true);
 
     // Hold decision should be interrupted, no layer activation yet
-    EXPECT_EQ(g_mock_state.layer_on_calls, 0);
+    EXPECT_EQ(g_mock_state.layer_on_calls.size(), 0);
 
     // Release interrupting key
     simulate_key_event(KC_Q, false, 50);
@@ -64,25 +66,25 @@ TEST_F(TapDanceInterruptionTest, InterruptionDuringHoldDecision) {
     simulate_key_event(CKC_LAY_MOUSE_Q, false, 50);
 
     // Should eventually trigger tap action due to interruption
-    advance_time(100);
-    EXPECT_EQ(g_mock_state.tap_code_calls, 1);
+    wait_ms(100);
+    EXPECT_EQ(g_mock_state.tap_code_calls.size(), 1);
     EXPECT_EQ(g_mock_state.last_tapped_code, KC_Q);
 }
 
 // Test interruption during multiple tap sequence
 TEST_F(TapDanceInterruptionTest, InterruptionDuringMultipleTapSequence) {
-    g_mock_state.tap_code_calls = 0;
+    g_mock_state.tap_code_calls.clear();
 
     // Start double tap sequence
     simulate_key_event(CKC_LAY_NUMBERS_R, true);
     simulate_key_event(CKC_LAY_NUMBERS_R, false, 50);
-    advance_time(50);
+    wait_ms(50);
 
     // Second tap
     simulate_key_event(CKC_LAY_NUMBERS_R, true);
 
     // Interrupt during second tap
-    advance_time(50);
+    wait_ms(50);
     simulate_key_event(KC_R, true);
     simulate_key_event(KC_R, false, 50);
 
@@ -90,83 +92,83 @@ TEST_F(TapDanceInterruptionTest, InterruptionDuringMultipleTapSequence) {
     simulate_key_event(CKC_LAY_NUMBERS_R, false, 50);
 
     // Should handle interruption gracefully
-    advance_time(200);
+    wait_ms(200);
 
     // Should eventually trigger some action
-    EXPECT_GE(g_mock_state.tap_code_calls, 1);
+    EXPECT_GE(g_mock_state.tap_code_calls.size(), 1);
 }
 
 // Test that other keys don't interfere when tap-dance key is not active
 TEST_F(TapDanceInterruptionTest, OtherKeysDoNotInterfereWhenInactive) {
-    g_mock_state.tap_code_calls = 0;
-    g_mock_state.layer_on_calls = 0;
+    g_mock_state.tap_code_calls.clear();
+    g_mock_state.layer_on_calls.clear();
 
     // Press and release other keys when tap-dance is not active
     simulate_key_event(KC_Q, true);
     simulate_key_event(KC_Q, false, 50);
-    advance_time(100);
+    wait_ms(100);
 
     simulate_key_event(KC_R, true);
     simulate_key_event(KC_R, false, 50);
-    advance_time(100);
+    wait_ms(100);
 
     // Should not affect tap-dance state
-    EXPECT_EQ(g_mock_state.tap_code_calls, 0);
-    EXPECT_EQ(g_mock_state.layer_on_calls, 0);
+    EXPECT_EQ(g_mock_state.tap_code_calls.size(), 0);
+    EXPECT_EQ(g_mock_state.layer_on_calls.size(), 0);
 
     // Now use tap-dance key normally
     simulate_key_event(CKC_LAY_MOUSE_Q, true);
     simulate_key_event(CKC_LAY_MOUSE_Q, false, 50);
-    advance_time(250);
+    wait_ms(250);
 
     // Should work normally
-    EXPECT_EQ(g_mock_state.tap_code_calls, 1);
+    EXPECT_EQ(g_mock_state.tap_code_calls.size(), 1);
     EXPECT_EQ(g_mock_state.last_tapped_code, KC_Q);
 }
 
 // Test interruption by multiple keys
 TEST_F(TapDanceInterruptionTest, InterruptionByMultipleKeys) {
-    g_mock_state.layer_on_calls = 0;
-    g_mock_state.tap_code_calls = 0;
+    g_mock_state.layer_on_calls.clear();
+    g_mock_state.tap_code_calls.clear();
 
     simulate_key_event(CKC_LAY_MOUSE_Q, true);
 
     // Multiple interrupting keys
-    advance_time(50);
+    wait_ms(50);
     simulate_key_event(KC_Q, true);
-    advance_time(20);
+    wait_ms(20);
     simulate_key_event(KC_R, true);
-    advance_time(30);
+    wait_ms(30);
     simulate_key_event(KC_Q, false);
-    advance_time(20);
+    wait_ms(20);
     simulate_key_event(KC_R, false);
 
     // Release original key
-    advance_time(30);
+    wait_ms(30);
     simulate_key_event(CKC_LAY_MOUSE_Q, false);
 
     // Should handle multiple interruptions gracefully
-    advance_time(200);
-    EXPECT_EQ(g_mock_state.layer_on_calls, 0); // Should not activate layer
-    EXPECT_GE(g_mock_state.tap_code_calls, 1); // Should trigger tap action
+    wait_ms(200);
+    EXPECT_EQ(g_mock_state.layer_on_calls.size(), 0); // Should not activate layer
+    EXPECT_GE(g_mock_state.tap_code_calls.size(), 1); // Should trigger tap action
 }
 
 // Test interruption after hold has already been activated
 TEST_F(TapDanceInterruptionTest, InterruptionAfterHoldActivated) {
-    g_mock_state.layer_on_calls = 0;
-    g_mock_state.layer_off_calls = 0;
+    g_mock_state.layer_on_calls.clear();
+    g_mock_state.layer_off_calls.clear();
 
     // Activate hold
     simulate_key_event(CKC_LAY_MOUSE_Q, true);
-    advance_time(250); // Trigger hold
+    wait_ms(250); // Trigger hold
 
-    EXPECT_EQ(g_mock_state.layer_on_calls, 1);
+    EXPECT_EQ(g_mock_state.layer_on_calls.size(), 1);
     EXPECT_TRUE(is_layer_active(_LMOUSE));
 
     // Now press other keys while layer is active
     simulate_key_event(KC_Q, true);
     simulate_key_event(KC_Q, false, 50);
-    advance_time(50);
+    wait_ms(50);
 
     // Layer should remain active
     EXPECT_TRUE(is_layer_active(_LMOUSE));
@@ -175,61 +177,61 @@ TEST_F(TapDanceInterruptionTest, InterruptionAfterHoldActivated) {
     simulate_key_event(CKC_LAY_MOUSE_Q, false);
 
     // Layer should be deactivated
-    EXPECT_EQ(g_mock_state.layer_off_calls, 1);
+    EXPECT_EQ(g_mock_state.layer_off_calls.size(), 1);
     EXPECT_FALSE(is_layer_active(_LMOUSE));
 }
 
 // Test rapid interruption patterns
 TEST_F(TapDanceInterruptionTest, RapidInterruptionPatterns) {
-    g_mock_state.tap_code_calls = 0;
+    g_mock_state.tap_code_calls.clear();
 
     // Start tap-dance
     simulate_key_event(CKC_LAY_MOUSE_Q, true);
 
     // Rapid alternating keys
     for (int i = 0; i < 5; i++) {
-        advance_time(10);
+        wait_ms(10);
         simulate_key_event(KC_Q, true);
-        advance_time(10);
+        wait_ms(10);
         simulate_key_event(KC_Q, false);
-        advance_time(10);
+        wait_ms(10);
         simulate_key_event(KC_R, true);
-        advance_time(10);
+        wait_ms(10);
         simulate_key_event(KC_R, false);
     }
 
     // Release original key
-    advance_time(50);
+    wait_ms(50);
     simulate_key_event(CKC_LAY_MOUSE_Q, false);
 
     // Should handle rapid interruptions without crashing
-    advance_time(200);
+    wait_ms(200);
 
     // Should eventually resolve to some action
-    EXPECT_GE(g_mock_state.tap_code_calls, 1);
+    EXPECT_GE(g_mock_state.tap_code_calls.size(), 1);
 }
 
 // Test that interruption doesn't affect subsequent tap-dance usage
 TEST_F(TapDanceInterruptionTest, InterruptionDoesNotAffectSubsequentUsage) {
     // First interrupted sequence
     simulate_key_event(CKC_LAY_MOUSE_Q, true);
-    advance_time(100);
+    wait_ms(100);
     simulate_key_event(KC_Q, true);
     simulate_key_event(KC_Q, false, 50);
     simulate_key_event(CKC_LAY_MOUSE_Q, false, 50);
-    advance_time(200);
+    wait_ms(200);
 
     // Reset call counters
-    g_mock_state.tap_code_calls = 0;
-    g_mock_state.layer_on_calls = 0;
+    g_mock_state.tap_code_calls.clear();
+    g_mock_state.layer_on_calls.clear();
 
     // Second normal sequence should work fine
-    advance_time(100);
+    wait_ms(100);
     simulate_key_event(CKC_LAY_MOUSE_Q, true);
-    advance_time(250);
+    wait_ms(250);
 
     // Should activate layer normally
-    EXPECT_EQ(g_mock_state.layer_on_calls, 1);
+    EXPECT_EQ(g_mock_state.layer_on_calls.size(), 1);
     EXPECT_TRUE(is_layer_active(_LMOUSE));
 
     simulate_key_event(CKC_LAY_MOUSE_Q, false);

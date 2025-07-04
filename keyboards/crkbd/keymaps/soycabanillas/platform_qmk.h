@@ -3,8 +3,14 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // Platform detection
-#ifdef QMK_KEYBOARD_H
+#ifdef UNIT_TEST
+    #define PLATFORM_TEST
+#elif defined(QMK_KEYBOARD_H)
     #define PLATFORM_QMK
 #elif defined(ZMK_INCLUDE_KERNEL_H)
     #define PLATFORM_ZMK
@@ -12,19 +18,8 @@
     #error "Unknown platform"
 #endif
 
-// Logging abstraction
-#ifdef PLATFORM_QMK
-    #ifdef CONSOLE_ENABLE
-        #define PLATFORM_LOGGING_ENABLED
-    #endif
-#elif defined(PLATFORM_ZMK)
-    #ifdef CONFIG_LOG
-        #define PLATFORM_LOGGING_ENABLED
-    #endif
-#endif
-
 // Generic types (platform-agnostic definitions)
-#ifdef PLATFORM_QMK
+#if defined(PLATFORM_TEST) || defined(PLATFORM_QMK)
     typedef uint16_t platform_keycode_t;
     typedef uint16_t platform_time_t;
 #elif defined(PLATFORM_ZMK)
@@ -36,6 +31,15 @@
     typedef int64_t platform_time_t;
 #endif
 
+#define MACRO_KEY_MODIFIER_LEFT_SHIFT  (1 << 0)
+#define MACRO_KEY_MODIFIER_RIGHT_SHIFT (1 << 1)
+#define MACRO_KEY_MODIFIER_LEFT_CTRL   (1 << 2)
+#define MACRO_KEY_MODIFIER_RIGHT_CTRL  (1 << 3)
+#define MACRO_KEY_MODIFIER_LEFT_ALT    (1 << 4)
+#define MACRO_KEY_MODIFIER_RIGHT_ALT   (1 << 5)
+#define MACRO_KEY_MODIFIER_LEFT_GUI    (1 << 6)
+#define MACRO_KEY_MODIFIER_RIGHT_GUI   (1 << 7)
+
 // Generic key position structure (platform-agnostic)
 typedef struct {
     uint8_t col;
@@ -44,36 +48,20 @@ typedef struct {
 
 // Generic key record structure (platform-agnostic)
 typedef struct {
-    struct {
-        platform_keypos_t key;
-        bool pressed;
-        platform_time_t time;
-    } event;
-} platform_keyrecord_t;
+    platform_keypos_t key;
+    bool     pressed;
+    platform_time_t time;
+} abskeyevent_t;
 
 // Timer functions
 platform_time_t platform_timer_read(void);
 platform_time_t platform_timer_elapsed(platform_time_t start);
-
-// Logging functions - simplified to avoid macro conflicts
-#ifdef PLATFORM_LOGGING_ENABLED
-    // For now, disable logging to avoid uprintf macro issues
-    // TODO: Implement proper logging later
-    #define platform_log_debug(fmt, ...)
-    #define platform_log_info(fmt, ...)
-    #define platform_log_error(fmt, ...)
-#else
-    #define platform_log_debug(fmt, ...)
-    #define platform_log_info(fmt, ...)
-    #define platform_log_error(fmt, ...)
-#endif
 
 // Platform-specific function declarations (mockable)
 void platform_register_code(platform_keycode_t keycode);
 void platform_unregister_code(platform_keycode_t keycode);
 void platform_tap_code(platform_keycode_t keycode);
 void platform_tap_code_delay(platform_keycode_t keycode, uint8_t delay);
-bool platform_is_key_pressed(platform_keyrecord_t *record);
 void platform_add_key(platform_keycode_t keycode);
 void platform_del_key(platform_keycode_t keycode);
 void platform_send_keyboard_report(void);
@@ -99,4 +87,8 @@ void platform_cancel_deferred_exec(platform_deferred_token token);
     // QMK-specific implementations will be in a separate .c file
 #elif defined(PLATFORM_ZMK)
     // TODO: ZMK-specific implementations will be in a separate .c file
+#endif
+
+#ifdef __cplusplus
+}
 #endif

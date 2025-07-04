@@ -1,10 +1,20 @@
 #pragma once
 
-#include "quantum_keycodes.h"
+// Platform detection
+#ifdef UNIT_TEST
+    #define CUSTOM_SAFE_RANGE 0x7E00
+#elif defined(QMK_KEYBOARD_H)
+    #include "quantum_keycodes.h"
+    #define CUSTOM_SAFE_RANGE SAFE_RANGE
+#elif defined(ZMK_INCLUDE_KERNEL_H)
+    #error "Unknown SAFE_RANGE for ZMK"
+#else
+    #error "Unknown platform"
+#endif
 
 // Custom Keycode Declarations
 enum planck_keycodes {
-  CKC_REMOVE_MODS = SAFE_RANGE,
+  CKC_REMOVE_MODS = CUSTOM_SAFE_RANGE,
   CKC_REMOVE_ONESHOTS,
   CKC_RESET_TAPPINGTERM,
   CKC_SET_TAPPINGTERM,
@@ -15,6 +25,15 @@ enum planck_keycodes {
   CKC_QUES,
   CKC_LAY_RIGHT_THUMB,
 
+  // Only for testing, remove later
+  CKC_LSHIFT_EXCLAMATION_MARK,
+  CKC_RSHIFT_QUESTION_MARK,
+  CKC_LAY_NUMBERS_S,
+  CKC_LAY_MOVEMENT_S,
+  CKC_LAY_RIGHT_THUMB_F,
+
+
+  // Oneshot modifiers
   CKC_ONESHOT_MODIFIER_LEFT_CTRL,
   CKC_ONESHOT_MODIFIER_RIGHT_CTRL,
   CKC_ONESHOT_MODIFIER_LEFT_ALT,
@@ -24,6 +43,7 @@ enum planck_keycodes {
   CKC_ONESHOT_MODIFIER_LEFT_GUI,
   CKC_ONESHOT_MODIFIER_RIGHT_GUI,
 
+  // Shifted replacements
   CKC_REPLACE_SHIFTED_2,
   CKC_REPLACE_SHIFTED_3,
   CKC_REPLACE_SHIFTED_4,
