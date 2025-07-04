@@ -19,8 +19,11 @@
 #include "commons.h"
 #include "abstractionsqmk.h"
 #include "key_buffer.h"
+#include "pipeline_key_replacer_initializer.h"
 #include "pipeline_key_replacer.h"
+#include "pipeline_oneshot_modifier_initializer.h"
 #include "pipeline_oneshot_modifier.h"
+#include "pipeline_tap_dance_initializer.h"
 #include "pipeline_tap_dance.h"
 
 // Layers
