@@ -1,4 +1,5 @@
 #include "pipeline_tap_dance.h"
+#include "key_buffer.h"
 
 #define g_tap_timeout 200
 
@@ -182,46 +183,48 @@ bool macros_process_key(platform_keycode_t keycode, abskeyevent_t abskeyevent, c
         //platform_log_debug("custom_layers_length: %u, keycodemodifier: %u", custom_layers->length, custom_layers->layers[i]->status.keycodemodifier);
         custom_behaviour_config *layer_status = custom_layers->layers[i];
         //platform_log_debug("keycodemodifier: %u", layer_status->status.keycodemodifier);
-        if (layer_status->callback(keycode, abskeyevent, &layer_status->status, layer_status->user_data) == false) {
+        if (custom_switch_layer_custom_function(keycode, abskeyevent, &layer_status->status, layer_status->user_data) == false) {
             return false;
         }
     }
     return true;
 }
 
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 void pipeline_tap_dance_callback(pipeline_callback_params_t* params, pipeline_config_t* config, void* user_data) {
-    // if (abskeyevent.pressed) {
-    //     lastKeyTapped = keycode;
-    //     lastKeyTappedTime = abskeyevent.time;
-    // }
-    // else {
-    //     lastKeyUntapped = keycode;
-    //     lastKeyUntappedTime = abskeyevent.time;
-    // }
-    // if (params->more_data == true) {
-    //     if (params->up == true && params->is_press == true) {
-    //         for (uint8_t i = 0; i < custom_layers->length; i++)
-    //         {
-    //             custom_behaviour_config *layer_status = custom_layers->layers[i];
-    //             if (layer_status->status.keycodemodifier == params->keycode) {
-    //                 config->needs_more_data = true;
-    //             }
-    //             // if (layer_status->callback(keycode, abskeyevent, &layer_status->status, layer_status->user_data) == false) return false;
-    //         }
-    //     }
-    // } else {
-    //     if (params->up == true && params->is_press == true) {
-    //         #ifdef CONSOLE_ENABLE
-    //             uprintf("MORE_DATA : 0x%04X\n", params->keycode);
-    //         #endif
-    //     }
-    // }
-}
+     custom_layers_struct* custom_layers = (custom_layers_struct*)user_data;
+     abskeyevent_t abskeyevent = {
+            .key = {.col = params->key.col, .row = params->key.row},
+            .pressed = params->callback_type == PIPELINE_CALLBACK_KEY_PRESS,
+            .time = params->time
+        };
+     macros_process_key(params->keycode, abskeyevent, custom_layers);
+//     if (params->callback_type == PIPELINE_CALLBACK_KEY_PRESS) {
+//         lastKeyTapped = params->keycode;
+//         lastKeyTappedTime = params->time;
+//     }
+//     else if (params->callback_type == PIPELINE_CALLBACK_KEY_RELEASE) {
+//         lastKeyUntapped = params->keycode;
+//         lastKeyUntappedTime = params->time;
+//     }
+//     else if (params->callback_type == PIPELINE_CALLBACK_TIMER) {
 
-#ifdef __cplusplus
+//     }
+//     if (params->more_data == true) {
+//         if (params->up == true && params->is_press == true) {
+//             for (uint8_t i = 0; i < custom_layers->length; i++)
+//             {
+//                 custom_behaviour_config *layer_status = custom_layers->layers[i];
+//                 if (layer_status->status.keycodemodifier == params->keycode) {
+//                     config->needs_more_data = true;
+//                 }
+//                 // if (layer_status->callback(keycode, abskeyevent, &layer_status->status, layer_status->user_data) == false) return false;
+//             }
+//         }
+//     } else {
+//         if (params->up == true && params->is_press == true) {
+//             #ifdef CONSOLE_ENABLE
+//                 uprintf("MORE_DATA : 0x%04X\n", params->keycode);
+//             #endif
+//         }
+//     }
 }
-#endif

@@ -7,11 +7,10 @@ BUILD_DIR = build/tests
 IMPL_DIR = keyboards/crkbd/keymaps/soycabanillas
 
 # Implementation source files
-IMPL_SOURCES = $(IMPL_DIR)/pipeline_tap_dance.c $(IMPL_DIR)/platform_qmk_impl.c
 IMPL_SOURCES_TEST = $(IMPL_DIR)/pipeline_tap_dance.c
 
 # Common compilation flags
-CXXFLAGS = -Wall -Wextra -std=c++14 -I$(TEST_DIR) -I$(IMPL_DIR) -DUNIT_TEST -DPLATFORM_TEST -DCONSOLE_ENABLE
+CXXFLAGS = -Wall -Wextra -std=c++14 -I$(TEST_DIR) -I$(IMPL_DIR) -DUNIT_TEST -DCONSOLE_ENABLE
 LDFLAGS = -lgtest -lgtest_main -lpthread
 
 # Test files (fixed versions using unified mock)
@@ -49,25 +48,25 @@ $(BUILD_DIR):
 	g++ $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 # Fixed comprehensive tests using unified mock
-$(BUILD_DIR)/test_basic_tap_fixed: $(TEST_DIR)/test_tap_dance_basic_tap_fixed.cpp $(TEST_DIR)/qmk_test_mock.cpp $(IMPL_SOURCES_TEST) | $(BUILD_DIR)
+$(BUILD_DIR)/test_basic_tap_fixed: $(TEST_DIR)/test_tap_dance_basic_tap_fixed.cpp $(TEST_DIR)/qmk_test_mock.cpp $(IMPL_DIR)/pipeline_tap_dance_initializer.c $(IMPL_SOURCES_TEST) | $(BUILD_DIR)
 	g++ $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-$(BUILD_DIR)/test_basic_hold_fixed: $(TEST_DIR)/test_tap_dance_basic_hold_fixed.cpp $(TEST_DIR)/qmk_test_mock.cpp $(IMPL_SOURCES_TEST) | $(BUILD_DIR)
+$(BUILD_DIR)/test_basic_hold_fixed: $(TEST_DIR)/test_tap_dance_basic_hold_fixed.cpp $(TEST_DIR)/qmk_test_mock.cpp $(IMPL_DIR)/pipeline_tap_dance_initializer.c $(IMPL_SOURCES_TEST) | $(BUILD_DIR)
 	g++ $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-$(BUILD_DIR)/test_multiple_tap_fixed: $(TEST_DIR)/test_tap_dance_multiple_tap_fixed.cpp $(TEST_DIR)/qmk_test_mock.cpp $(IMPL_SOURCES_TEST) | $(BUILD_DIR)
+$(BUILD_DIR)/test_multiple_tap_fixed: $(TEST_DIR)/test_tap_dance_multiple_tap_fixed.cpp $(TEST_DIR)/qmk_test_mock.cpp $(IMPL_DIR)/pipeline_tap_dance_initializer.c $(IMPL_SOURCES_TEST) | $(BUILD_DIR)
 	g++ $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-$(BUILD_DIR)/test_tap_hold_interaction_fixed: $(TEST_DIR)/test_tap_dance_tap_hold_interaction_fixed.cpp $(TEST_DIR)/qmk_test_mock.cpp $(IMPL_SOURCES_TEST) | $(BUILD_DIR)
+$(BUILD_DIR)/test_tap_hold_interaction_fixed: $(TEST_DIR)/test_tap_dance_tap_hold_interaction_fixed.cpp $(TEST_DIR)/qmk_test_mock.cpp $(IMPL_DIR)/pipeline_tap_dance_initializer.c $(IMPL_SOURCES_TEST) | $(BUILD_DIR)
 	g++ $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-$(BUILD_DIR)/test_layer_switching_fixed: $(TEST_DIR)/test_tap_dance_layer_switching_fixed.cpp $(TEST_DIR)/qmk_test_mock.cpp $(IMPL_SOURCES_TEST) | $(BUILD_DIR)
+$(BUILD_DIR)/test_layer_switching_fixed: $(TEST_DIR)/test_tap_dance_layer_switching_fixed.cpp $(TEST_DIR)/qmk_test_mock.cpp $(IMPL_DIR)/pipeline_tap_dance_initializer.c $(IMPL_SOURCES_TEST) | $(BUILD_DIR)
 	g++ $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-$(BUILD_DIR)/test_timeout_fixed: $(TEST_DIR)/test_tap_dance_timeout_fixed.cpp $(TEST_DIR)/qmk_test_mock.cpp $(IMPL_SOURCES_TEST) | $(BUILD_DIR)
+$(BUILD_DIR)/test_timeout_fixed: $(TEST_DIR)/test_tap_dance_timeout_fixed.cpp $(TEST_DIR)/qmk_test_mock.cpp $(IMPL_DIR)/pipeline_tap_dance_initializer.c $(IMPL_SOURCES_TEST) | $(BUILD_DIR)
 	g++ $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
-$(BUILD_DIR)/test_interruption_fixed: $(TEST_DIR)/test_tap_dance_interruption_fixed.cpp $(TEST_DIR)/qmk_test_mock.cpp $(IMPL_SOURCES_TEST) | $(BUILD_DIR)
+$(BUILD_DIR)/test_interruption_fixed: $(TEST_DIR)/test_tap_dance_interruption_fixed.cpp $(TEST_DIR)/qmk_test_mock.cpp $(IMPL_DIR)/pipeline_tap_dance_initializer.c $(IMPL_SOURCES_TEST) | $(BUILD_DIR)
 	g++ $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
 
 # Test targets

@@ -5,9 +5,6 @@
 // Global mock state
 MockQMKState g_mock_state = {};
 
-// Global custom_layers variable (shared between test and implementation)
-custom_layers_struct *custom_layers = nullptr;
-
 void reset_mock_state(void) {
     g_mock_state = {};
 }

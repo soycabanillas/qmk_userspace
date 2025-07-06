@@ -36,27 +36,11 @@ extern struct MockQMKState g_mock_state;
 
 #endif
 
-
-// Custom layer types
-typedef struct {
-    void* user_data;
-} custom_layer_t;
-
-typedef struct {
-    size_t length;
-    custom_layer_t* layers[];  // Flexible array member to match implementation
-} custom_layers_struct;
-
-// Global custom_layers variable (shared between test and implementation)
-extern custom_layers_struct *custom_layers;
-
 // MockQMKState is defined above in the C++ section
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "platform_qmk.h"
 
 // Platform function declarations for test environment
 void platform_layer_on(uint8_t layer);
@@ -84,10 +68,6 @@ bool is_layer_on(uint8_t layer);
 void reset_mock_state(void);
 void advance_time(uint16_t ms);
 bool is_layer_active(uint8_t layer);
-
-// Tap dance functions
-void* pipeline_tap_dance_initialize_user_data(void);
-bool macros_process_key(uint16_t keycode, abskeyevent_t event);
 
 #ifdef __cplusplus
 }

@@ -19,11 +19,11 @@
 #include "commons.h"
 #include "abstractionsqmk.h"
 #include "key_buffer.h"
+#include "keymap_initializer.h"
 #include "pipeline_key_replacer_initializer.h"
 #include "pipeline_key_replacer.h"
 #include "pipeline_oneshot_modifier_initializer.h"
 #include "pipeline_oneshot_modifier.h"
-#include "pipeline_tap_dance_initializer.h"
 #include "pipeline_tap_dance.h"
 
 // Layers
@@ -202,13 +202,15 @@ void keyboard_post_init_user(void) {
   //debug_keyboard=true;
   //debug_mouse=true;
 
+    custom_layers_struct* tap_dance_layers = pipeline_tap_dance_initialize_user_data();
+
     size_t n_pipelines = 3;
     pipeline_array = malloc(sizeof(pipeline_array_t) + n_pipelines * sizeof(pipeline_t*));
     pipeline_array->length = n_pipelines;
 
     pipeline_array->pipelines[0] = add_pipeline(&pipeline_oneshot_modifier_callback, pipeline_oneshot_modifier_initialize_user_data());
     pipeline_array->pipelines[1] = add_pipeline(&pipeline_key_replacer_callback, pipeline_key_replacer_initialize_user_data());
-    pipeline_array->pipelines[2] = add_pipeline(&pipeline_tap_dance_callback, pipeline_tap_dance_initialize_user_data());
+    pipeline_array->pipelines[2] = add_pipeline(&pipeline_tap_dance_callback, tap_dance_layers);
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {

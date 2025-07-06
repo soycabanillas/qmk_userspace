@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+pipeline_array_t *pipeline_array = NULL;
+
 typedef struct {
     platform_keypos_t key;
     platform_keycode_t keycode;
@@ -144,6 +146,7 @@ void execute_pipeline(bool up, uint16_t callback_time, uint8_t macro_buffer_pos,
     if (callback_time == 0) {
         callback_params.keycode = press_buffer_selected->keycode;
         callback_params.key = press_buffer_selected->key;
+        callback_params.time = callback_time;
         if (press_buffer_selected->is_press == true) {
             callback_params.callback_type = PIPELINE_CALLBACK_KEY_PRESS;
         } else {

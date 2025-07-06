@@ -22,6 +22,7 @@ typedef struct {
     bool up;
     platform_keycode_t keycode;
     platform_keypos_t key;
+    platform_time_t time;
     pipeline_callback_type_t callback_type;
     pipeline_info_t info;
 } pipeline_callback_params_t;
@@ -47,6 +48,6 @@ typedef struct {
 } pipeline_array_t;
 
 
-pipeline_array_t *pipeline_array;
+extern pipeline_array_t *pipeline_array;
 bool pipeline_process_key(platform_keycode_t keycode, abskeyevent_t abskeyevent);
 pipeline_t* add_pipeline(pipeline_callback callback, void* user_data);

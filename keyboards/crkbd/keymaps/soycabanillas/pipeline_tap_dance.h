@@ -1,12 +1,12 @@
 #pragma once
 
-#include "key_buffer.h"
 
+#include <stddef.h>
+#include "key_buffer.h"
+#include "platform_qmk.h"
 typedef struct {
     platform_keycode_t keycodemodifier;
 } t_layer_status;
-
-typedef bool (*custom_behaviour_callback)(platform_keycode_t, abskeyevent_t, t_layer_status*, void*);
 
 typedef enum {
     TDCL_TAP_KEY_SENDKEY,
@@ -26,7 +26,6 @@ typedef struct {
 typedef struct {
     t_layer_status status;
     void *user_data;
-    custom_behaviour_callback callback;
 } custom_behaviour_config;
 
 typedef struct {
@@ -75,5 +74,14 @@ typedef struct {
     custom_action_custom_behaviour *actions[];
 } custom_switch_layer_custom_data;
 
-bool custom_switch_layer_custom_function (platform_keycode_t keycode, abskeyevent_t event, t_layer_status *status, void *user_data);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+bool macros_process_key(platform_keycode_t keycode, abskeyevent_t abskeyevent, custom_layers_struct *custom_layers);
+
+#ifdef __cplusplus
+}
+#endif
+
 void pipeline_tap_dance_callback(pipeline_callback_params_t* params, pipeline_config_t* config, void* user_data);
