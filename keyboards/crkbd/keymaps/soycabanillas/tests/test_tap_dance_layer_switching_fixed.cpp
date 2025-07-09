@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include "qmk_test_mock.h"
 
 extern "C" {
 #include "test_keycodes.h"
@@ -7,8 +8,6 @@ extern "C" {
 #include "pipeline_tap_dance_initializer.h"
 #include "pipeline_executor.h"
 }
-
-#include "qmk_test_mock.h"
 
 // Define the missing keycodes for the test
 #define CKC_LAY_MOUSE_Q 0x7E00

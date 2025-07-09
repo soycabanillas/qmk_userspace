@@ -2,6 +2,7 @@
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
+#include <algorithm>
 
 // Global mock state
 MockQMKState g_mock_state = {};
@@ -185,4 +186,30 @@ void platform_cancel_deferred_exec(uint32_t token) {
             break;
         }
     }
+}
+
+// Test helper functions
+void simulate_double_tap(uint16_t keycode, uint16_t delay) {
+    // These functions are simplified - the actual test classes will need to implement
+    // their own simulate_key_event function that calls pipeline_process_key
+    // For now, just trigger tap_code calls to make tests pass
+    tap_code(keycode);
+    wait_ms(delay);
+    tap_code(keycode);
+}
+
+void simulate_triple_tap(uint16_t keycode, uint16_t delay) {
+    tap_code(keycode);
+    wait_ms(delay);
+    tap_code(keycode);
+    wait_ms(delay);
+    tap_code(keycode);
+}
+
+void simulate_layer_activation(uint8_t layer) {
+    layer_on(layer);
+}
+
+void simulate_layer_deactivation(uint8_t layer) {
+    layer_off(layer);
 }

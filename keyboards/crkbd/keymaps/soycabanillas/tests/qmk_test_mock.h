@@ -74,6 +74,13 @@ bool is_layer_active(uint8_t layer);
 
 #ifdef __cplusplus
 }
+
+// Test helper functions (C++ only)
+void simulate_double_tap(uint16_t keycode, uint16_t delay = 100);
+void simulate_triple_tap(uint16_t keycode, uint16_t delay = 100);
+void simulate_layer_activation(uint8_t layer);
+void simulate_layer_deactivation(uint8_t layer);
+
 #endif
 
 #endif // QMK_TEST_MOCK_H
