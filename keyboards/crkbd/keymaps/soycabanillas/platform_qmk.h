@@ -40,6 +40,18 @@ extern "C" {
 #define MACRO_KEY_MODIFIER_LEFT_GUI    (1 << 6)
 #define MACRO_KEY_MODIFIER_RIGHT_GUI   (1 << 7)
 
+typedef enum {
+    MODIFIER_LEFT_SHIFT  = (1 << 0),
+    MODIFIER_RIGHT_SHIFT = (1 << 1),
+    MODIFIER_LEFT_CTRL   = (1 << 2),
+    MODIFIER_RIGHT_CTRL  = (1 << 3),
+    MODIFIER_LEFT_ALT    = (1 << 4),
+    MODIFIER_RIGHT_ALT   = (1 << 5),
+    MODIFIER_LEFT_GUI    = (1 << 6),
+    MODIFIER_RIGHT_GUI   = (1 << 7)
+} modifier_t;
+
+
 // Generic key position structure (platform-agnostic)
 typedef struct {
     uint8_t col;
@@ -74,12 +86,13 @@ void platform_del_mods(platform_keycode_t mods);
 void platform_wait_ms(uint16_t ms);
 
 // Layer management abstractions
-void platform_layer_on(uint8_t layer);
-void platform_layer_off(uint8_t layer);
+void platform_layer_select(uint8_t layer);
+uint8_t platform_layer_get_current(void);
 
 // Deferred execution abstractions
 typedef uint32_t platform_deferred_token;
 typedef uint32_t (*platform_deferred_callback)(uint32_t trigger_time, void *cb_arg);
+typedef void (*platform_deferred_callback_no_return)(uint32_t trigger_time, void *cb_arg);
 platform_deferred_token platform_defer_exec(uint32_t delay_ms, platform_deferred_callback callback, void *cb_arg);
 void platform_cancel_deferred_exec(platform_deferred_token token);
 

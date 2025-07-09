@@ -1,3 +1,4 @@
+#include "key_buffer.h"
 #include "platform_qmk.h"
 
 #ifdef PLATFORM_QMK
@@ -16,6 +17,9 @@
 #endif
 
 #ifdef PLATFORM_QMK
+
+uint8_t platform_current_layer = 0;
+
 // Timer implementations
 platform_time_t platform_timer_read(void) {
     return timer_read();
@@ -83,12 +87,14 @@ void platform_wait_ms(uint16_t ms) {
 }
 
 // Layer management implementations
-void platform_layer_on(uint8_t layer) {
-    layer_on(layer);
+void platform_layer_select(uint8_t layer)
+{
+    platform_current_layer = layer;
+    layer_move(layer);
 }
 
-void platform_layer_off(uint8_t layer) {
-    layer_off(layer);
+uint8_t platform_layer_get_current(void) {
+    return platform_current_layer;
 }
 
 // Deferred execution implementations

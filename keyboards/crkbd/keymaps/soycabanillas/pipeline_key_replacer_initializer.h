@@ -2,4 +2,4 @@
 
 #include "pipeline_key_replacer.h"
 
-pipeline_key_replacer_global_t* pipeline_key_replacer_initialize_user_data(void);
+pipeline_key_replacer_pair_t* pipeline_key_replacer_create_pairs(platform_keycode_t keycode, replacer_callback callback);

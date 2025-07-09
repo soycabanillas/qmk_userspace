@@ -2,4 +2,4 @@
 
 #include "pipeline_oneshot_modifier.h"
 
-pipeline_oneshot_modifier_global_t* pipeline_oneshot_modifier_initialize_user_data(void);
+pipeline_oneshot_modifier_pair_t* pipeline_oneshot_modifier_create_pairs(platform_keycode_t keycode, uint8_t modifiers);

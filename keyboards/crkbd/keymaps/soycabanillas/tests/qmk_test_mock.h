@@ -45,10 +45,13 @@ extern "C" {
 // Platform function declarations for test environment
 void platform_layer_on(uint8_t layer);
 void platform_layer_off(uint8_t layer);
+void platform_layer_select(uint8_t layer);
 void platform_clear_keyboard(void);
 void platform_tap_code_delay(uint16_t keycode, uint8_t delay);
 uint32_t platform_defer_exec(uint32_t delay_ms, uint32_t (*callback)(uint32_t, void*), void* cb_arg);
 void platform_cancel_deferred_exec(uint32_t token);
+uint16_t platform_timer_read(void);
+uint16_t platform_timer_elapsed(uint16_t start);
 
 // QMK function mocks
 void wait_ms(uint16_t ms);

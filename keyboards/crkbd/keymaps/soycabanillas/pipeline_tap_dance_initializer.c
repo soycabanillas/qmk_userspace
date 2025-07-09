@@ -1,37 +1,42 @@
 #include "pipeline_tap_dance_initializer.h"
 #include <stdlib.h>
 #include <string.h>
+#include "pipeline_tap_dance.h"
 
-custom_action_custom_behaviour* createbehaviouraction(uint8_t repetitions, td_customlayer_action_t action, platform_keycode_t keycode, uint8_t layer) {
-    custom_action_custom_behaviour behaviouraction = {
+pipeline_tap_dance_behaviour_status_t* pipeline_tap_dance_behaviour_state_create(void) {
+    pipeline_tap_dance_behaviour_status_t* behaviour_status = (pipeline_tap_dance_behaviour_status_t*)malloc(sizeof(pipeline_tap_dance_behaviour_status_t));
+    reset_behaviour_state(behaviour_status);
+    return behaviour_status;
+}
+
+pipeline_tap_dance_action_config_t* createbehaviouraction(uint8_t repetitions, td_customlayer_action_t action, platform_keycode_t keycode, uint8_t layer) {
+    pipeline_tap_dance_action_config_t behaviouraction = {
         .repetitions = repetitions,
         .action = action,
         .keycode = keycode,
         .layer = layer,
     };
-    custom_action_custom_behaviour* allocation = (custom_action_custom_behaviour*)malloc(sizeof behaviouraction);
+    pipeline_tap_dance_action_config_t* allocation = (pipeline_tap_dance_action_config_t*)malloc(sizeof behaviouraction);
     memcpy(allocation, &behaviouraction, sizeof behaviouraction);
     return allocation;
 }
 
-custom_behaviour_config* createbehaviour(platform_keycode_t keycodemodifier, custom_action_custom_behaviour* actions[], size_t actionslength) {
-    custom_switch_layer_custom_data userdata = {
-        .sequence = _HOLD_OR_TAP_STATE_NOT_SET
+pipeline_tap_dance_behaviour_t* createbehaviour(platform_keycode_t keycodemodifier, pipeline_tap_dance_action_config_t* actions[], size_t actionslength) {
+    pipeline_tap_dance_behaviour_config_t userdata = {
+        .keycodemodifier = keycodemodifier,
+        .actionslength = actionslength
     };
-    userdata.actionslength = actionslength;
-    custom_switch_layer_custom_data* allocationuserdata = (custom_switch_layer_custom_data*)malloc(sizeof(custom_switch_layer_custom_data) + actionslength * sizeof (custom_action_custom_behaviour*));
+    pipeline_tap_dance_behaviour_config_t* allocationuserdata = (pipeline_tap_dance_behaviour_config_t*)malloc(sizeof(pipeline_tap_dance_behaviour_config_t) + actionslength * sizeof (pipeline_tap_dance_action_config_t*));
     memcpy(allocationuserdata, &userdata, sizeof userdata);
     for (size_t i = 0; i < actionslength; i++)
     {
         allocationuserdata->actions[i] = actions[i];
     }
-    custom_behaviour_config behaviour = {
-        .status = {
-            .keycodemodifier = keycodemodifier
-        },
-        .user_data = (void*) allocationuserdata,
+    pipeline_tap_dance_behaviour_t behaviour = {
+        .status = pipeline_tap_dance_behaviour_state_create(),
+        .config = allocationuserdata
     };
-    custom_behaviour_config* allocation = (custom_behaviour_config*)malloc(sizeof behaviour);
+    pipeline_tap_dance_behaviour_t* allocation = (pipeline_tap_dance_behaviour_t*)malloc(sizeof behaviour);
     memcpy(allocation, &behaviour, sizeof behaviour);
     return allocation;
 }

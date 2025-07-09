@@ -1,6 +1,7 @@
 SRC += platform_qmk_impl.c
 SRC += key_buffer.c
 SRC += keymap_initializer.c
+SRC += pipeline_executor.c
 SRC += pipeline_oneshot_modifier_initializer.c
 SRC += pipeline_oneshot_modifier.c
 SRC += pipeline_key_replacer_initializer.c

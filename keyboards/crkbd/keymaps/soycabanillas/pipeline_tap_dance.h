@@ -1,37 +1,21 @@
 #pragma once
 
-
 #include <stddef.h>
-#include "key_buffer.h"
+#include <stdint.h>
+#include "pipeline_executor.h"
 #include "platform_qmk.h"
-typedef struct {
-    platform_keycode_t keycodemodifier;
-} t_layer_status;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef enum {
     TDCL_TAP_KEY_SENDKEY,
-    TDCL_HOLD_KEY_SENDKEY,
+    // TDCL_HOLD_KEY_SENDKEY,
     TDCL_HOLD_KEY_CHANGELAYERTEMPO,
     // TDCL_TAP_KEY_CUSTOM,
     // TDCL_HOLD_KEY_CUSTOM,
 } td_customlayer_action_t;
-
-typedef struct {
-    uint8_t repetitions;
-    td_customlayer_action_t action;
-    platform_keycode_t keycode;
-    uint8_t layer;
-} custom_action_custom_behaviour;
-
-typedef struct {
-    t_layer_status status;
-    void *user_data;
-} custom_behaviour_config;
-
-typedef struct {
-    size_t length;
-    custom_behaviour_config *layers[];
-} custom_layers_struct;
 
 typedef enum {
   _HOLD_STATE_NOT_SET,
@@ -48,40 +32,68 @@ typedef enum {
   _HOLD,
   _NONE
 } hold_or_tap_sequence;
-// custom_layers_struct *custom_layers = NULL;
 
 typedef enum {
-  _PRESS_MAIN_KEY,
-  _RELEASE_MAIN_KEY,
-  _PRESS_OTHER_KEY,
-  _RELEASE_OTHER_KEY,
-} custom_key_event;
+    _WAITING_FOR_TAP,
+    _AFTER_TAP,
+    _HOLD_CONFIRMED,
+    _AFTER_UNTAP
+} pipeline_tap_dance_key_status_t;
+
+typedef struct {
+    uint8_t repetitions;
+    td_customlayer_action_t action;
+    platform_keycode_t keycode;
+    uint8_t layer;
+} pipeline_tap_dance_action_config_t;
 
 typedef struct {
     uint8_t count;
     bool hasholdaction : 1;
     bool haskeyaction : 1;
-    uint8_t original_layer;
-    uint8_t selected_layer;
     hold_or_tap_sequence sequence;
     hold_state state;
-    uint8_t press_buffer_pos;
+    uint8_t press_buffer_index;
     uint8_t keybuffer_length;
     platform_deferred_token hold_span_reached_token;
     platform_keycode_t selected_keycode;
     platform_deferred_token key_repetition_span_exceeded_token;
+
+    uint8_t original_layer;
+    uint8_t key_tap_repetition_count; // Number of times the key has been tapped
+    pipeline_tap_dance_key_status_t key_status;
+    uint8_t selected_layer;
+} pipeline_tap_dance_behaviour_status_t;
+
+typedef struct {
+    platform_keycode_t keycodemodifier;
     size_t actionslength;
-    custom_action_custom_behaviour *actions[];
-} custom_switch_layer_custom_data;
+    pipeline_tap_dance_action_config_t *actions[];
+} pipeline_tap_dance_behaviour_config_t;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+typedef struct {
+    pipeline_tap_dance_behaviour_config_t* config;
+    pipeline_tap_dance_behaviour_status_t* status;
+} pipeline_tap_dance_behaviour_t;
 
-bool macros_process_key(platform_keycode_t keycode, abskeyevent_t abskeyevent, custom_layers_struct *custom_layers);
+typedef struct {
+    size_t last_behaviour; // The last layer that was processed
+} pipeline_tap_dance_global_status_t;
+
+typedef struct {
+    size_t length; // Number of custom behaviour configurations
+    pipeline_tap_dance_behaviour_t *behaviours[]; // Array of custom behaviour configurations
+} pipeline_tap_dance_global_config_t;
+
+void pipeline_tap_dance_global_state_create(void);
+void reset_behaviour_state(pipeline_tap_dance_behaviour_status_t *layer_status);
+
+pipeline_tap_dance_behaviour_status_t* pipeline_tap_dance_behaviour_state_create(void);
+
+// bool macros_process_key(platform_keycode_t keycode, abskeyevent_t abskeyevent, custom_layers_struct *custom_layers);
+void pipeline_tap_dance_callback(pipeline_callback_params_t* params, pipeline_actions_t* actions, void* user_data);
 
 #ifdef __cplusplus
 }
 #endif
 
-void pipeline_tap_dance_callback(pipeline_callback_params_t* params, pipeline_config_t* config, void* user_data);

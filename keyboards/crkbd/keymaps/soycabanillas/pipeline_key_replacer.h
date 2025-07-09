@@ -1,6 +1,6 @@
 #pragma once
 
-#include "key_buffer.h"
+#include "pipeline_executor.h"
 
 typedef struct {
     uint8_t modifiers;
@@ -22,10 +22,10 @@ typedef struct {
 typedef struct {
     size_t length;
     pipeline_key_replacer_pair_t* modifier_pairs[];
-} pipeline_key_replacer_pairs_array_t;
+} pipeline_key_replacer_global_config_t;
 
 typedef struct {
-    pipeline_key_replacer_pairs_array_t* pairs;
+    pipeline_key_replacer_global_config_t* config;
 } pipeline_key_replacer_global_t;
 
-void pipeline_key_replacer_callback(pipeline_callback_params_t* params, pipeline_config_t* config, void* user_data);
+void pipeline_key_replacer_callback(pipeline_callback_params_t* params, pipeline_actions_t* actions, void* user_data);

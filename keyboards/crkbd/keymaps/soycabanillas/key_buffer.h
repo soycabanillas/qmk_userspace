@@ -3,51 +3,42 @@
 #include <stddef.h>
 #include "platform_qmk.h"
 
-// typedef bool (*is_pressed)(platform_keycode_t);
-// typedef void (*remove_from_press_buffer)(platform_keycode_t);
-
-typedef enum {
-    PIPELINE_CALLBACK_KEY_PRESS,
-    PIPELINE_CALLBACK_KEY_RELEASE,
-    PIPELINE_CALLBACK_TIMER
-} pipeline_callback_type_t;
-
-typedef bool (*is_pressed)(platform_keycode_t);
-
 typedef struct {
-    is_pressed is_pressed_fn;
-} pipeline_info_t;
-
-typedef struct {
-    bool up;
-    platform_keycode_t keycode;
     platform_keypos_t key;
+    platform_keycode_t keycode;
+    uint8_t layer;
+    bool release_on_buffer; //This flag marks that the key has been released, but the key is not erased until the buffer is processed. This way, info like the time the key was pressed, or the keycode can be obtained.
     platform_time_t time;
-    pipeline_callback_type_t callback_type;
-    pipeline_info_t info;
-} pipeline_callback_params_t;
+} only_press_buffer_item_t;
 
 typedef struct {
-    platform_time_t callback_time;
-} pipeline_config_t;
+    platform_keypos_t key;
+    platform_keycode_t keycode;
+    uint8_t layer;
+    bool is_press;
+    platform_time_t time;
+    // The following fields are used to track the pipeline that created the keyboard event
+    bool is_from_pipeline; // Indicates if the key event is from a pipeline
+    size_t pipeline_index; // The index of the pipeline that created the keyboard event
+} press_buffer_item_t;
 
-typedef void (*pipeline_callback)(pipeline_callback_params_t*, pipeline_config_t*, void*);
+#define ONLY_PRESS_BUFFER_MAX 5
+
+
+#define PRESS_BUFFER_MAX 10
 
 typedef struct {
-    pipeline_callback callback;
-    void* data;
-} pipeline_definition_t;
+    only_press_buffer_item_t only_press_buffer[ONLY_PRESS_BUFFER_MAX];
+    uint8_t only_press_buffer_pos;
+    press_buffer_item_t press_buffer[PRESS_BUFFER_MAX];
+    uint8_t press_buffer_pos;
+} key_buffer_t;
 
-typedef struct {
-    pipeline_definition_t* definition;
-} pipeline_t;
+key_buffer_t* pipeline_key_buffer_create(void);
+void pipeline_key_buffer_destroy(key_buffer_t* key_buffer);
 
-typedef struct {
-    size_t length;
-    pipeline_t *pipelines[];
-} pipeline_array_t;
+bool key_buffer_is_pressed(key_buffer_t *key_buffer, platform_keycode_t keycode);
+bool add_to_press_buffer(key_buffer_t *key_buffer, platform_keycode_t keycode, platform_keypos_t key, platform_time_t time, uint8_t layer, bool is_press, bool is_from_pipeline, size_t pipeline_index);
+void remove_from_press_buffer(key_buffer_t *key_buffer, uint8_t pos);
 
 
-extern pipeline_array_t *pipeline_array;
-bool pipeline_process_key(platform_keycode_t keycode, abskeyevent_t abskeyevent);
-pipeline_t* add_pipeline(pipeline_callback callback, void* user_data);

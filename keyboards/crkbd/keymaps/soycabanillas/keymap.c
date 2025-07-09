@@ -14,17 +14,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
 #include QMK_KEYBOARD_H
-#include "print.h"
+// #include "print.h"
 #include "commons.h"
 #include "abstractionsqmk.h"
-#include "key_buffer.h"
 #include "keymap_initializer.h"
-#include "pipeline_key_replacer_initializer.h"
-#include "pipeline_key_replacer.h"
-#include "pipeline_oneshot_modifier_initializer.h"
-#include "pipeline_oneshot_modifier.h"
-#include "pipeline_tap_dance.h"
 
 // Layers
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -202,15 +197,27 @@ void keyboard_post_init_user(void) {
   //debug_keyboard=true;
   //debug_mouse=true;
 
-    custom_layers_struct* tap_dance_layers = pipeline_tap_dance_initialize_user_data();
 
     size_t n_pipelines = 3;
-    pipeline_array = malloc(sizeof(pipeline_array_t) + n_pipelines * sizeof(pipeline_t*));
-    pipeline_array->length = n_pipelines;
+    pipeline_executor_config = (pipeline_executor_config_t*)malloc(sizeof(pipeline_executor_config_t) + n_pipelines * sizeof(pipeline_t*));
+    pipeline_executor_config->length = n_pipelines;
+    pipeline_executor_global_state_create();
 
-    pipeline_array->pipelines[0] = add_pipeline(&pipeline_oneshot_modifier_callback, pipeline_oneshot_modifier_initialize_user_data());
-    pipeline_array->pipelines[1] = add_pipeline(&pipeline_key_replacer_callback, pipeline_key_replacer_initialize_user_data());
-    pipeline_array->pipelines[2] = add_pipeline(&pipeline_tap_dance_callback, tap_dance_layers);
+    pipeline_oneshot_modifier_global_config_t* oneshot_modifier_global_config = pipeline_oneshot_modifier_global_config_create();
+    pipeline_oneshot_modifier_global_status_t* oneshot_modifier_global_status = pipeline_oneshot_modifier_global_state_create();
+    pipeline_oneshot_modifier_global_t* oneshot_modifier_global = malloc(sizeof(pipeline_oneshot_modifier_global_t));
+    oneshot_modifier_global->config = oneshot_modifier_global_config;
+    oneshot_modifier_global->status = oneshot_modifier_global_status;
+    pipeline_executor_config->pipelines[0] = add_pipeline(&pipeline_oneshot_modifier_callback, pipeline_oneshot_modifier_global_config_create());
+
+    pipeline_key_replacer_global_config_t* key_replacer_global_config = pipeline_key_replacer_global_config_create();
+    pipeline_key_replacer_global_t* key_replacer_global = malloc(sizeof(pipeline_key_replacer_global_t));
+    key_replacer_global->config = key_replacer_global_config;
+    pipeline_executor_config->pipelines[1] = add_pipeline(&pipeline_key_replacer_callback, pipeline_key_replacer_global_config_create());
+
+    pipeline_tap_dance_global_config_t* tap_dance_global_config = pipeline_tap_dance_global_config_create();
+    pipeline_tap_dance_global_state_create();
+    pipeline_executor_config->pipelines[2] = add_pipeline(&pipeline_tap_dance_callback, tap_dance_global_config);
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -227,7 +234,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         .time = record->event.time
     };
 
-    //if (macros_process_key(keycode, abskeyevent) == false) return false;
     if (pipeline_process_key(keycode, abskeyevent) == false) return false;
 
     return true;
