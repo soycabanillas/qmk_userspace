@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <stddef.h>
+#include <cstdint>
 
 #ifdef __cplusplus
 #include <vector>

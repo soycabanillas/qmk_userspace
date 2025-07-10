@@ -1,4 +1,89 @@
 CompileFlags:
-  Add: [-Wno-unknown-attributes, -Wno-maybe-uninitialized, -Wno-unknown-warning-option]
-  Remove: [-W*, -mmcu=*, -mcpu=*, -mfpu=*, -mfloat-abi=*, -mno-unaligned-access, -mno-thumb-interwork, -mcall-prologues, -D__has_include*]
+  Add:
+    - -Wno-unknown-attributes
+    - -Wno-maybe-uninitialized
+    - -Wno-unknown-warning-option
+  Remove:
+    - -W*
+    - -mmcu=*
+    - -mcpu=*
+    - -mfpu=*
+    - -mfloat-abi=*
+    - -mno-unaligned-access
+    - -mno-thumb-interwork
+    - -mcall-prologues
+    - -D__has_include*
+    - -fcaller-saves
+    - -fdata-sections
+    - -fdevirtualize-at-ltrans
+    - -ffunction-sections
+    - -fgcse-after-reload
+    - -fipa-pta
+    - -fno-fat-lto-objects
+    - -fno-tree-loop-vectorize
+    - -fno-tree-slp-vectorize
+    - -freorder-functions
+    - -ftree-switch-conversion
+    - -ftree-tail-merge
+    - -fwhole-program
   Compiler: clang
+
+Index:
+  Background: Build
+
+InlayHints:
+  Enabled: true
+  ParameterNames: true
+  DeducedTypes: true
+
+Hover:
+  ShowAKA: true
+
+Diagnostics:
+  UnusedIncludes: Strict
+  MissingIncludes: Strict
+
+---
+If:
+  PathMatch: .*\.cpp
+CompileFlags:
+  Add:
+    - -std=c++14
+    - -DUNIT_TEST
+    - -DCONSOLE_ENABLE
+    - -Wall
+    - -Wextra
+    - -Ikeyboards/crkbd/keymaps/soycabanillas
+    - -Ikeyboards/crkbd/keymaps/soycabanillas/tests
+    - -I/usr/include/gtest
+    - -I/usr/local/include
+  Remove:
+    - -mmcu=*
+    - -avr*
+    - -DAVR*
+
+---
+If:
+  PathMatch: .*\.hpp
+CompileFlags:
+  Add:
+    - -std=c++14
+    - -DUNIT_TEST
+    - -DCONSOLE_ENABLE
+    - -Wall
+    - -Wextra
+    - -Ikeyboards/crkbd/keymaps/soycabanillas
+    - -Ikeyboards/crkbd/keymaps/soycabanillas/tests
+    - -I/usr/include/gtest
+    - -I/usr/local/include
+  Remove:
+    - -mmcu=*
+    - -avr*
+    - -DAVR*
+
+---
+If:
+  PathMatch: .*\.c
+CompileFlags:
+  Add:
+    - -std=c99

@@ -1,0 +1,91 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build QMK Firmware",
+            "type": "shell",
+            "command": "make",
+            "args": ["crkbd:soycabanillas"],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "detail": "Build the QMK firmware for crkbd with soycabanillas keymap"
+        },
+        {
+            "label": "Flash QMK Firmware",
+            "type": "shell",
+            "command": "make",
+            "args": ["crkbd:soycabanillas:flash"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "detail": "Flash the QMK firmware to the keyboard"
+        },
+        {
+            "label": "Build C++ Tests",
+            "type": "shell",
+            "command": "make",
+            "args": ["-f", "Makefile.fixed", "comprehensive-fixed"],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "detail": "Build all C++ tests using the fixed Makefile"
+        },
+        {
+            "label": "Clean C++ Tests",
+            "type": "shell",
+            "command": "make",
+            "args": ["-f", "Makefile.fixed", "clean"],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "detail": "Clean the test build directory"
+        },
+        {
+            "label": "Run Single Test",
+            "type": "shell",
+            "command": "${workspaceFolder}/build/tests/test_basic_tap_fixed",
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "dependsOn": "Build C++ Tests",
+            "detail": "Run a single test (basic tap test as example)"
+        }
+    ]
+}

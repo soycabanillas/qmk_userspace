@@ -1,4 +1,8 @@
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
 #include "gtest/gtest.h"
+#include "platform_qmk.h"
 #include "qmk_test_mock.h"
 
 extern "C" {

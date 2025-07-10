@@ -25,15 +25,15 @@ LED_MATRIX_ENABLE = no        # Disable single-color LED matrix
 
 # Additional size optimizations
 WPM_ENABLE = no               # Disable words per minute tracking
-# LEADER_ENABLE = no           # Disable leader key
-# COMBO_ENABLE = no            # Disable key combos
-# TAP_DANCE_ENABLE = no        # Disable tap dance (unless you need it)
-# MOUSEKEY_ENABLE = no         # Disable mouse keys
-# MUSIC_MODE_ENABLE = no       # Disable music mode
-# GRAVE_ESC_ENABLE = no        # Disable grave escape (if not using)
-# MAGIC_ENABLE = no            # Disable magic commands
-# SPACE_CADET_ENABLE = no      # Disable space cadet (if not using)
-# BOOTMAGIC_ENABLE = no        # Disable bootmagic (keeps lite version)
+LEADER_ENABLE = no            # Disable leader key
+COMBO_ENABLE = no             # Disable key combos
+TAP_DANCE_ENABLE = no        # Disable tap dance (unless you need it)
+MOUSEKEY_ENABLE = no          # Disable mouse keys
+MUSIC_ENABLE = no             # Disable music mode
+GRAVE_ESC_ENABLE = no         # Disable grave escape (if not using)
+MAGIC_ENABLE = no             # Disable magic commands
+SPACE_CADET_ENABLE = no       # Disable space cadet (if not using)
+BOOTMAGIC_ENABLE = no         # Disable bootmagic completely
 
 # Compiler optimizations for size
 OPT = s                      # Optimize for size instead of speed
@@ -45,6 +45,6 @@ BLUETOOTH_ENABLE = no
 SPLIT_KEYBOARD = yes         # Keep this for Corne
 ENCODER_ENABLE = no          # Disable rotary encoder support
 POINTING_DEVICE_ENABLE = no  # Disable pointing device
-# AUTO_SHIFT_ENABLE = no       # Disable auto shift
-# KEY_OVERRIDE_ENABLE = no     # Disable key overrides
+AUTO_SHIFT_ENABLE = no       # Disable auto shift
+ KEY_OVERRIDE_ENABLE = no     # Disable key overrides
 

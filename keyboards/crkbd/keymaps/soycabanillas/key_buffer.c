@@ -1,5 +1,6 @@
 #include "key_buffer.h"
 #include "platform_qmk.h"
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>

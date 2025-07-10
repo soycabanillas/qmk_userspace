@@ -1,4 +1,8 @@
+#include <cstddef>
+#include <cstdint>
+#include <cstdlib>
 #include "gtest/gtest.h"
+#include "platform_qmk.h"
 
 extern "C" {
 #include "test_keycodes.h"

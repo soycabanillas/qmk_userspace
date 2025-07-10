@@ -1,5 +1,6 @@
 #include "platform_qmk.h"
 #include "qmk_test_mock.h"
+#include <cstdint>
 #include <cstring>
 #include <cstdlib>
 #include <cstdio>
