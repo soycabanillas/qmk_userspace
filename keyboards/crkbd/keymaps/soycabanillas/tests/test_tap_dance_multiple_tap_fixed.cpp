@@ -96,7 +96,7 @@ protected:
             .time = static_cast<uint16_t>(g_mock_state.time + time_offset)
         };
         if (time_offset > 0) {
-            wait_ms(time_offset);
+            platform_wait_ms(time_offset);
         }
         pipeline_process_key(keycode, event);
     }
@@ -109,7 +109,7 @@ TEST_F(TapDanceMultipleTapTest, DoubleTapMouseKey) {
     g_mock_state.tap_code_calls.clear();
 
     simulate_double_tap(CKC_LAY_MOUSE_Q);
-    wait_ms(250); // Allow tap dance to complete
+    platform_wait_ms(250); // Allow tap dance to complete
 
     // Should register two Q taps for double tap
     EXPECT_GE(g_mock_state.tap_code_calls_count(), 2);
@@ -121,7 +121,7 @@ TEST_F(TapDanceMultipleTapTest, TripleTapSequence) {
     g_mock_state.tap_code_calls.clear();
 
     simulate_triple_tap(CKC_LAY_NUMBERS_R);
-    wait_ms(250);
+    platform_wait_ms(250);
 
     // Should register multiple R taps for triple tap
     EXPECT_GE(g_mock_state.tap_code_calls_count(), 3);
@@ -134,14 +134,14 @@ TEST_F(TapDanceMultipleTapTest, TimingSensitivity) {
 
     // Double tap with quick timing
     simulate_double_tap(CKC_LAY_MOUSE_Q, 50); // Fast double tap
-    wait_ms(250);
+    platform_wait_ms(250);
 
     int fast_tap_count = g_mock_state.tap_code_calls_count();
 
     // Reset and try slow timing
     g_mock_state.tap_code_calls.clear();
     simulate_double_tap(CKC_LAY_MOUSE_Q, 300); // Slow double tap (should timeout)
-    wait_ms(250);
+    platform_wait_ms(250);
 
     int slow_tap_count = g_mock_state.tap_code_calls_count();
 
@@ -165,7 +165,7 @@ TEST_F(TapDanceMultipleTapTest, SequenceInterruption) {
     simulate_key_event(CKC_LAY_MOUSE_Q, true);
     simulate_key_event(CKC_LAY_MOUSE_Q, false, 50);
 
-    wait_ms(250);
+    platform_wait_ms(250);
 
     // Should have registered some taps
     EXPECT_GT(g_mock_state.tap_code_calls_count(), 0);
@@ -180,10 +180,9 @@ TEST_F(TapDanceMultipleTapTest, MultipleTapVsHold) {
     simulate_double_tap(CKC_LAY_MOUSE_Q, 50);
 
     // Brief pause, then hold
-    wait_ms(100);
+    platform_wait_ms(100);
     simulate_key_event(CKC_LAY_MOUSE_Q, true);
-    wait_ms(250); // Long enough to trigger hold
-    layer_on(_LMOUSE); // Simulate layer activation for hold
+    platform_wait_ms(250); // Long enough to trigger hold
     simulate_key_event(CKC_LAY_MOUSE_Q, false);
 
     // Should have both tap and layer behavior
@@ -199,10 +198,10 @@ TEST_F(TapDanceMultipleTapTest, RapidMultipleTaps) {
     for (int i = 0; i < 5; i++) {
         simulate_key_event(CKC_LAY_NUMBERS_R, true);
         simulate_key_event(CKC_LAY_NUMBERS_R, false, 25); // Very fast
-        wait_ms(25);
+        platform_wait_ms(25);
     }
 
-    wait_ms(250);
+    platform_wait_ms(250);
 
     // Should handle rapid input gracefully
     EXPECT_GT(g_mock_state.tap_code_calls_count(), 0);
@@ -217,17 +216,17 @@ TEST_F(TapDanceMultipleTapTest, AlternatingMultipleTaps) {
     simulate_key_event(CKC_LAY_MOUSE_Q, true);
     simulate_key_event(CKC_LAY_MOUSE_Q, false, 50);
 
-    wait_ms(50);
+    platform_wait_ms(50);
 
     simulate_key_event(CKC_LAY_NUMBERS_R, true);
     simulate_key_event(CKC_LAY_NUMBERS_R, false, 50);
 
-    wait_ms(50);
+    platform_wait_ms(50);
 
     simulate_key_event(CKC_LAY_MOUSE_Q, true);
     simulate_key_event(CKC_LAY_MOUSE_Q, false, 50);
 
-    wait_ms(250);
+    platform_wait_ms(250);
 
     // Should register taps from both keys
     EXPECT_GT(g_mock_state.tap_code_calls_count(), 0);

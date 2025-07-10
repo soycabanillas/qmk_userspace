@@ -16,22 +16,22 @@ platform_time_t lastKeyUntappedTime = 0;
 // Forward declarations
 pipeline_tap_dance_action_config_t* get_action_tap_key_sendkey(uint8_t repetitions, pipeline_tap_dance_behaviour_config_t* custom_switch_layer_custom_data);
 
-uint32_t hold_span_reached_timer(uint32_t trigger_time, void *cb_arg) {
-    pipeline_tap_dance_behaviour_status_t *status = (pipeline_tap_dance_behaviour_status_t*)cb_arg;
-    status->state = _HOLD_TRESHOLD_DETECTED;
-    status->sequence = _HOLD;
-    platform_layer_select(status->selected_layer);
-    status->hold_span_reached_token = 0;
-    return 0;
-}
+// uint32_t hold_span_reached_timer(uint32_t trigger_time, void *cb_arg) {
+//     pipeline_tap_dance_behaviour_status_t *status = (pipeline_tap_dance_behaviour_status_t*)cb_arg;
+//     status->state = _HOLD_TRESHOLD_DETECTED;
+//     status->sequence = _HOLD;
+//     platform_layer_select(status->selected_layer);
+//     status->hold_span_reached_token = 0;
+//     return 0;
+// }
 
-uint32_t key_repetition_span_exceeded_timer(uint32_t trigger_time, void *cb_arg) {
-    pipeline_tap_dance_behaviour_status_t *status = (pipeline_tap_dance_behaviour_status_t*)cb_arg;
-    status->key_repetition_span_exceeded_token = 0;
-    // platform_log_debug("key_repetition_span_exceeded_timer - tap_code16_delay");
-    platform_tap_code_delay(status->selected_keycode, 10);
-    return 0;
-}
+// uint32_t key_repetition_span_exceeded_timer(uint32_t trigger_time, void *cb_arg) {
+//     pipeline_tap_dance_behaviour_status_t *status = (pipeline_tap_dance_behaviour_status_t*)cb_arg;
+//     status->key_repetition_span_exceeded_token = 0;
+//     // platform_log_debug("key_repetition_span_exceeded_timer - tap_code16_delay");
+//     platform_tap_code_delay(status->selected_keycode, 10);
+//     return 0;
+// }
 
 pipeline_tap_dance_action_config_t* get_action_tap_key_sendkey(uint8_t repetitions, pipeline_tap_dance_behaviour_config_t* custom_switch_layer_custom_data) {
     pipeline_tap_dance_action_config_t* action;

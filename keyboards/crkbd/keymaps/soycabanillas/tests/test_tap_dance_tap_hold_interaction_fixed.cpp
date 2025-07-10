@@ -96,7 +96,7 @@ protected:
             .time = static_cast<uint16_t>(g_mock_state.time + time_offset)
         };
         if (time_offset > 0) {
-            wait_ms(time_offset);
+            platform_wait_ms(time_offset);
         }
         pipeline_process_key(keycode, event);
     }
@@ -111,10 +111,9 @@ TEST_F(TapDanceTapHoldInteractionTest, HoldOverridesTapWhenHeldLongEnough) {
 
     // Press key and hold long enough to trigger hold action
     simulate_key_event(CKC_LAY_MOUSE_Q, true);
-    wait_ms(250); // Hold longer than tap timeout
+    platform_wait_ms(250); // Hold longer than tap timeout
 
     // Simulate layer activation for hold (since our mock doesn't implement hold logic)
-    layer_on(_LMOUSE);
 
     // Release key
     simulate_key_event(CKC_LAY_MOUSE_Q, false);
@@ -137,12 +136,11 @@ TEST_F(TapDanceTapHoldInteractionTest, TapThenHoldSequence) {
     simulate_key_event(CKC_LAY_MOUSE_Q, true);
     simulate_key_event(CKC_LAY_MOUSE_Q, false, 50);
 
-    wait_ms(100); // Brief pause
+    platform_wait_ms(100); // Brief pause
 
     // Then: Hold
     simulate_key_event(CKC_LAY_MOUSE_Q, true);
-    wait_ms(250); // Hold
-    layer_on(_LMOUSE); // Simulate layer activation
+    platform_wait_ms(250); // Hold
     simulate_key_event(CKC_LAY_MOUSE_Q, false);
 
     // Should have both tap and hold actions
@@ -157,12 +155,11 @@ TEST_F(TapDanceTapHoldInteractionTest, HoldThenTapSequence) {
 
     // First: Hold
     simulate_key_event(CKC_LAY_MOUSE_Q, true);
-    wait_ms(250);
-    layer_on(_LMOUSE);
+    platform_wait_ms(250);
     simulate_key_event(CKC_LAY_MOUSE_Q, false);
     layer_off(_LMOUSE);
 
-    wait_ms(100); // Brief pause
+    platform_wait_ms(100); // Brief pause
 
     // Then: Quick tap
     simulate_key_event(CKC_LAY_MOUSE_Q, true);
@@ -183,13 +180,13 @@ TEST_F(TapDanceTapHoldInteractionTest, RapidTapHoldTransitions) {
     simulate_key_event(CKC_LAY_NUMBERS_R, false, 30);
 
     simulate_key_event(CKC_LAY_NUMBERS_R, true);
-    wait_ms(150); // Short hold
+    platform_wait_ms(150); // Short hold
     simulate_key_event(CKC_LAY_NUMBERS_R, false);
 
     simulate_key_event(CKC_LAY_NUMBERS_R, true);
     simulate_key_event(CKC_LAY_NUMBERS_R, false, 30);
 
-    wait_ms(250);
+    platform_wait_ms(250);
 
     // Should register some activity
     EXPECT_GT(g_mock_state.tap_code_calls_count(), 0);
@@ -202,15 +199,14 @@ TEST_F(TapDanceTapHoldInteractionTest, OverlappingTapHoldDifferentKeys) {
 
     // Start holding first key
     simulate_key_event(CKC_LAY_MOUSE_Q, true);
-    wait_ms(100);
+    platform_wait_ms(100);
 
     // While holding first, tap second key
     simulate_key_event(CKC_LAY_NUMBERS_R, true);
     simulate_key_event(CKC_LAY_NUMBERS_R, false, 50);
 
     // Continue holding first key
-    wait_ms(200);
-    layer_on(_LMOUSE); // Simulate layer activation for first key
+    platform_wait_ms(200);
     simulate_key_event(CKC_LAY_MOUSE_Q, false);
 
     // Should handle both keys appropriately
@@ -225,10 +221,10 @@ TEST_F(TapDanceTapHoldInteractionTest, InterruptedHold) {
 
     // Press and release before hold timeout
     simulate_key_event(CKC_LAY_MOUSE_Q, true);
-    wait_ms(150); // Less than typical 200ms timeout
+    platform_wait_ms(150); // Less than typical 200ms timeout
     simulate_key_event(CKC_LAY_MOUSE_Q, false);
 
-    wait_ms(250);
+    platform_wait_ms(250);
 
     // Should treat as tap since hold wasn't completed
     EXPECT_GE(g_mock_state.tap_code_calls_count(), 1);

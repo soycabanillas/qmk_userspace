@@ -96,7 +96,7 @@ protected:
             .time = static_cast<uint16_t>(g_mock_state.time + time_offset)
         };
         if (time_offset > 0) {
-            wait_ms(time_offset);
+            platform_wait_ms(time_offset);
         }
         pipeline_process_key(keycode, event);
     }
@@ -111,14 +111,12 @@ TEST_F(TapDanceTimeoutTest, HoldTimeoutRespected) {
     simulate_key_event(CKC_LAY_MOUSE_Q, true);
 
     // Just before timeout (199ms)
-    wait_ms(199);
+    platform_wait_ms(199);
     EXPECT_EQ(g_mock_state.layer_on_calls.size(), 0);
 
     // Just after timeout (1ms more = 200ms total) - simulate layer activation
-    wait_ms(1);
-    layer_on(_LMOUSE); // Simulate hold timeout triggering layer activation
+    platform_wait_ms(1);
     EXPECT_EQ(g_mock_state.layer_on_calls.size(), 1);
-    EXPECT_TRUE(is_layer_active(_LMOUSE));
 }
 
 // Test tap timeout for multiple taps
@@ -133,7 +131,7 @@ TEST_F(TapDanceTimeoutTest, TapTimeoutForMultipleTaps) {
     size_t initial_calls = g_mock_state.tap_code_calls.size();
 
     // Wait just under timeout
-    wait_ms(149); // Total 199ms
+    platform_wait_ms(149); // Total 199ms
     // Tap count should not increase during wait
     EXPECT_EQ(g_mock_state.tap_code_calls.size(), initial_calls);
 
@@ -142,7 +140,7 @@ TEST_F(TapDanceTimeoutTest, TapTimeoutForMultipleTaps) {
     simulate_key_event(CKC_LAY_NUMBERS_R, false, 50);
 
     // Now wait for timeout to trigger double-tap action
-    wait_ms(200);
+    platform_wait_ms(200);
 
     // Should have called tap_code for the double-tap action
     EXPECT_EQ(g_mock_state.tap_code_calls.size(), initial_calls + 1);
@@ -158,7 +156,7 @@ TEST_F(TapDanceTimeoutTest, TapsOutsideTimeoutTreatedSeparately) {
     simulate_key_event(CKC_LAY_NUMBERS_R, false, 50);
 
     // Wait past timeout
-    wait_ms(250);
+    platform_wait_ms(250);
 
     // Should trigger single tap action
     EXPECT_EQ(g_mock_state.tap_code_calls.size(), 1);
@@ -167,7 +165,7 @@ TEST_F(TapDanceTimeoutTest, TapsOutsideTimeoutTreatedSeparately) {
     // Second tap after timeout
     simulate_key_event(CKC_LAY_NUMBERS_R, true);
     simulate_key_event(CKC_LAY_NUMBERS_R, false, 50);
-    wait_ms(250);
+    platform_wait_ms(250);
 
     // Should trigger another single tap action
     EXPECT_EQ(g_mock_state.tap_code_calls.size(), 2);
@@ -188,7 +186,7 @@ TEST_F(TapDanceTimeoutTest, EarlyTimeoutCancellationOnQuickRelease) {
     EXPECT_EQ(g_mock_state.layer_on_calls.size(), 0);
 
     // Wait past original timeout to trigger tap
-    wait_ms(150);
+    platform_wait_ms(150);
 
     // Should trigger tap action instead
     EXPECT_EQ(g_mock_state.tap_code_calls.size(), 1);
@@ -203,11 +201,9 @@ TEST_F(TapDanceTimeoutTest, PreciseTimingOfDeferredExecution) {
     simulate_key_event(CKC_LAY_MOUSE_Q, true);
 
     // Check that exactly at timeout threshold, action triggers
-    wait_ms(200); // Exactly at g_tap_timeout
-    layer_on(_LMOUSE); // Simulate hold action triggering
+    platform_wait_ms(200); // Exactly at g_tap_timeout
 
     EXPECT_EQ(g_mock_state.layer_on_calls.size(), 1);
-    EXPECT_TRUE(is_layer_active(_LMOUSE));
 }
 
 // Test timeout behavior with multiple rapid taps
@@ -217,17 +213,17 @@ TEST_F(TapDanceTimeoutTest, TimeoutWithMultipleRapidTaps) {
     // Three rapid taps
     simulate_key_event(CKC_LAY_NUMBERS_R, true);
     simulate_key_event(CKC_LAY_NUMBERS_R, false, 30);
-    wait_ms(50);
+    platform_wait_ms(50);
 
     simulate_key_event(CKC_LAY_NUMBERS_R, true);
     simulate_key_event(CKC_LAY_NUMBERS_R, false, 30);
-    wait_ms(50);
+    platform_wait_ms(50);
 
     simulate_key_event(CKC_LAY_NUMBERS_R, true);
     simulate_key_event(CKC_LAY_NUMBERS_R, false, 30);
 
     // Wait for timeout
-    wait_ms(200);
+    platform_wait_ms(200);
 
     // Should handle gracefully (likely fallback to single tap)
     EXPECT_GE(g_mock_state.tap_code_calls.size(), 1);
@@ -241,7 +237,7 @@ TEST_F(TapDanceTimeoutTest, TimeoutCancellationOnInterruption) {
     simulate_key_event(CKC_LAY_MOUSE_Q, true);
 
     // Interrupt with another key before timeout
-    wait_ms(100);
+    platform_wait_ms(100);
     simulate_key_event(KC_Q, true);
     simulate_key_event(KC_Q, false, 50);
 
@@ -249,7 +245,7 @@ TEST_F(TapDanceTimeoutTest, TimeoutCancellationOnInterruption) {
     simulate_key_event(CKC_LAY_MOUSE_Q, false, 50);
 
     // Should not activate layer due to interruption
-    wait_ms(100);
+    platform_wait_ms(100);
     EXPECT_EQ(g_mock_state.layer_on_calls.size(), 0);
 
     // Should eventually trigger tap action
