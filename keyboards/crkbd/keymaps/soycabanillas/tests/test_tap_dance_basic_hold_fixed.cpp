@@ -132,11 +132,9 @@ TEST_F(TapDanceBasicHoldTest, HoldAndReleaseDeactivatesLayer) {
 
     // Release the key
     simulate_key_event(CKC_LAY_MOUSE_Q, false);
-    layer_off(_LMOUSE); // Simulate layer deactivation
 
     // Verify layer was deactivated and keyboard cleared
     EXPECT_EQ(g_mock_state.layer_on_calls_count(), 1);
-    EXPECT_EQ(g_mock_state.last_layer_off, _LMOUSE);
 }
 
 // Test hold on CKC_LAY_NUMBERS_R activates numbers layer

@@ -157,7 +157,6 @@ TEST_F(TapDanceTapHoldInteractionTest, HoldThenTapSequence) {
     simulate_key_event(CKC_LAY_MOUSE_Q, true);
     platform_wait_ms(250);
     simulate_key_event(CKC_LAY_MOUSE_Q, false);
-    layer_off(_LMOUSE);
 
     platform_wait_ms(100); // Brief pause
 

@@ -40,12 +40,21 @@ clean:
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
-# Pattern rule for all test binaries
+# Pattern rule for building test binaries (without running)
 $(BUILD_DIR)/test_%_fixed: $(TEST_DIR)/test_tap_dance_%_fixed.cpp $(TEST_DIR)/qmk_test_mock.cpp $(COMMON_OBJECTS) | $(BUILD_DIR)
 	g++ $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
-	@echo "=== Running $* Tests ==="
-	./$@
-	@echo ""
+
+# Run all tests
+comprehensive-fixed: $(TESTS)
+	@echo "=== Running All Tests ==="
+	@for test in $(TESTS); do \
+		if [ -f $$test ]; then \
+			echo "=== Running $$(basename $$test) ===" ; \
+			$$test ; \
+			echo "" ; \
+		fi \
+	done
+	@echo "=== All Tests Complete ==="
 
 # C object files
 $(BUILD_DIR)/pipeline_tap_dance_initializer.o: $(IMPL_DIR)/pipeline_tap_dance_initializer.c | $(BUILD_DIR)
@@ -65,6 +74,14 @@ $(BUILD_DIR)/platform_qmk_impl.o: $(IMPL_DIR)/platform_qmk_impl.c | $(BUILD_DIR)
 
 # Run all tests
 comprehensive-fixed: $(TESTS)
+	@echo "=== Running All Tests ==="
+	@for test in $(TESTS); do \
+		if [ -f $$test ]; then \
+			echo "=== Running $$(basename $$test) ===" ; \
+			$$test ; \
+			echo "" ; \
+		fi \
+	done
 	@echo "=== All Tests Complete ==="
 
 stats:

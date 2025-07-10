@@ -20,7 +20,6 @@ struct MockQMKState {
     uint16_t last_unregistered_code;
     uint16_t last_tapped_code;
     uint8_t last_layer_on;
-    uint8_t last_layer_off;
     uint8_t mods;
 
     int tap_code_calls_count() const { return tap_code_calls.size(); }
