@@ -1,0 +1,13 @@
+#pragma once
+
+typedef enum  {
+  _LQWERTY,
+  _LLEFT_THUMB,
+  _LRIGHT_THUMB,
+  _LMOVEMENT,
+  _LMOVEMENT_RIGTH_PINK,
+  _LMOUSE,
+  _LNUMBERS,
+  _LMEDIA,
+  _LFUNCTIONKEYS
+} planck_layers;

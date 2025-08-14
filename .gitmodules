@@ -1,0 +1,3 @@
+[submodule "modules/soycabanillas"]
+	path = modules/soycabanillas
+	url = https://github.com/soycabanillas/monkeyboard.git
