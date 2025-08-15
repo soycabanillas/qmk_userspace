@@ -16,6 +16,8 @@
 
 
 #include "modules/soycabanillas/src/monkeyboard_deferred_callbacks.h"
+#include "modules/soycabanillas/src/pipeline_tap_dance.h"
+#include "modules/soycabanillas/src/pipeline_tap_dance_initializer.h"
 #include "modules/soycabanillas/src/pipeline_executor.h"
 #include "modules/soycabanillas/src/platform_interface.h"
 #include QMK_KEYBOARD_H
@@ -51,107 +53,104 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * | Gui  | Ctrl | Alt  | Shift|M_LTHU|Sh/ESC| Space|MO(RT)| Shift| Alt  | Ctrl | Caps |
  * `-----------------------------------------------------------------------------------'
  */
-	[_LQWERTY] = LAYOUT_split_3x6_3(
-/*    1               2           3        4              5                   6                      7        8                        9           10                11                       12   */
-    KC_ESC , KC_Q, KC_W   , KC_E   , LT(_LNUMBERS, KC_R)      , KC_T                  , KC_Y   , KC_U             , LT(_LMEDIA,KC_I), KC_O, KC_P                              , KC_BSPC,
-    //KC_ESC , CKC_LAY_MOUSE_Q, KC_W   , KC_E   , CKC_LAY_NUMBERS_R      , KC_T                  , KC_Y   , KC_U             , LT(_LMEDIA,KC_I), KC_O, KC_P                              , KC_BSPC,
-    CKC_LAY_RIGHT_THUMB, LT(_LMOUSE, KC_A)           , KC_S   , KC_D   , LT(_LMOVEMENT, KC_F)     , KC_G                  , KC_H   , KC_J             , KC_K            , KC_L, LT(_LMOVEMENT_RIGTH_PINK,KC_SCLN) , KC_QUOT,
-    //CKC_LAY_RIGHT_THUMB , KC_A           , KC_S   , KC_D   , CKC_LAY_MOVEMENT_F     , KC_G                  , KC_H   , KC_J             , KC_K            , KC_L, LT(_LMOVEMENT_RIGTH_PINK,KC_SCLN) , KC_QUOT,
-    KC_LSFT, KC_Z           , KC_X   , KC_C   , LT(_LFUNCTIONKEYS,KC_V), KC_B                  , KC_N   , KC_M             , KC_COMM, KC_DOT , KC_SLSH                                 , KC_RSFT,
-    KC_LSFT, MO(_LLEFT_THUMB)       , KC_ENT                , KC_SPC , MO(_LRIGHT_THUMB), KC_RCTL
-  ),
-/* _LLEFT_THUMB
- * ,-----------------------------------------------------------------------------------.
- * |      |   1  |   2  |   3  |   4  |   5  |   6  |   7  |   8  |   9  |   0  | Bksp |
- * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |      |OsLCTL|OsLALT|OsLSHI|OsLGUI|      |      |OsRGUI|OsRSHI|OsRALT|OsRCTL|      |
- * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |      |      |      |      |      |      |      |      |      |      |      |      |
- * |------+------+------+------+------+------+------+------+------+------+------+------|
- * | TRAN | TRAN | TRAN | TRAN | TRAN |      | Enter|MO(BT)| TRAN | TRAN | TRAN | TRAN |
- * `-----------------------------------------------------------------------------------'
- */
-	[_LLEFT_THUMB] = LAYOUT_split_3x6_3(
-    KC_NO  , KC_1                 , KC_2   , KC_3   , KC_4   , KC_5 , KC_6               , KC_7             , KC_8         , KC_9         , KC_0         , KC_BSPC,
-    KC_2   , CKC_ONESHOT_MODIFIER_LEFT_CTRL, CKC_ONESHOT_MODIFIER_LEFT_ALT, CKC_ONESHOT_MODIFIER_LEFT_SHIFT, CKC_ONESHOT_MODIFIER_LEFT_GUI, KC_NO, KC_NO, CKC_ONESHOT_MODIFIER_RIGHT_GUI, CKC_ONESHOT_MODIFIER_RIGHT_SHIFT, CKC_ONESHOT_MODIFIER_RIGHT_ALT, CKC_ONESHOT_MODIFIER_RIGHT_CTRL, KC_NO,
-    KC_NO  , KC_NO, KC_NO  , KC_NO  , KC_NO  , KC_NO, KC_NO    , KC_NO            , KC_NO        , KC_NO        , KC_NO        , KC_NO,
-    KC_TRNS, KC_TRNS, KC_NO, KC_ENT             , KC_NO, KC_TRNS
-  ),
-/* _LRIGHT_THUMB
- * ,-----------------------------------------------------------------------------------.
- * |      |   `  |   @  |   #  |   $  |   %  |   ^  |   [  |   ]  |   \  | Bksp |      |
- * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |      |   <  |   >  |   {  |   }  |      |   _  |   (  |   )  |   :  |   =  |      |
- * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |      |   &  |   |  |  !/¡ |  ?/¿ |   `  |   ~  |   /  |   *  |   -  |   +  |      |
- * |------+------+------+------+------+------+------+------+------+------+------+------|
- * | TRAN | TRAN | TRAN | TRAN |MO(BT)|      |      | TRAN | TRAN | TRAN | TRAN | TRAN |
- * `-----------------------------------------------------------------------------------'
- */
-	[_LRIGHT_THUMB] = LAYOUT_split_3x6_3(
-    KC_NO  , KC_GRV , KC_AT  , KC_HASH,  KC_DLR           , KC_PERC              , KC_CIRC, KC_LBRC, KC_RBRC, KC_BSLS, KC_BSPC, KC_NO,
-    KC_NO  , KC_LT  , KC_GT  , KC_LCBR,  KC_RCBR          , KC_NO                , KC_UNDS, KC_LPRN, KC_RPRN, KC_COLN, KC_EQL , KC_NO,
-    KC_NO  , KC_AMPR, KC_PIPE, CKC_EXCL, CKC_QUES         , CKC_REPLACE_SHIFTED_2, KC_TILD, KC_SLSH, KC_ASTR, KC_MINS, KC_PLUS, KC_NO,
-    KC_TRNS,  KC_NO, KC_NO                , KC_NO  , KC_TRNS, KC_TRNS
-  ),
-/* _LMOVEMENT
- * ,-----------------------------------------------------------------------------------.
- * |      |      |      |      |      |      | Home | PgUp | PgDo | End  | Bksp |      |
- * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |      | LCtrl| LAlt |LShift| TRAN |      | Left | Down |  Up  | Righ | Del  |      |
- * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |      |Ctrl C|Ctrl V|Ctrl X|      |      |      |      |      |      |      |      |
- * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |      |      |      |S(TAB)|  TAB | ESC  | Space| Enter|  APP |      |      |      |
- * `-----------------------------------------------------------------------------------'
- */
-	[_LMOVEMENT] = LAYOUT_split_3x6_3(
-    KC_NO, KC_NO     , KC_NO     , KC_NO           , KC_NO  , KC_NO , KC_HOME, KC_PGUP, KC_PGDN, KC_END,  KC_BSPC, KC_NO,
-    KC_NO, KC_LCTL   , KC_LALT   , KC_LSFT         , KC_TRNS, KC_NO , KC_LEFT , KC_DOWN, KC_UP  , KC_RGHT, KC_DEL , KC_NO,
-    KC_NO, LCTL(KC_C), LCTL(KC_V), LCTL(KC_X)      , KC_NO  , KC_NO , KC_NO   , KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_NO,
-    LSFT(KC_TAB)    , KC_TAB , KC_ESC, KC_SPC  , KC_ENT , KC_APP
-  ),
-	[_LMOVEMENT_RIGTH_PINK] = LAYOUT_split_3x6_3(
-    KC_NO, LGUI(KC_TAB), RCS(KC_T)   , LCTL(KC_F4) , LALT(KC_F4), KC_NO  , LGUI(KC_M), LGUI(KC_R), KC_NO, LGUI(KC_E), KC_NO  , KC_NO,
-    KC_NO, KC_LCTL     , KC_LALT     , KC_LSFT     , KC_LGUI    , KC_PSCR, KC_LEFT   , KC_DOWN   , KC_UP, KC_RGHT   , KC_TRNS, KC_NO,
-    KC_NO, RCS(KC_TAB) , LCTL(KC_TAB), KC_NO       , KC_NO      , KC_NO  , KC_NO     , KC_NO     , KC_NO, KC_NO     , KC_NO  , KC_NO,
-    LSFT(KC_TAB), KC_TAB     , KC_ESC , KC_NO     , KC_APP    , KC_NO
-  ),
-	[_LMOUSE] = LAYOUT_split_3x6_3(
-    KC_NO, KC_TRNS , KC_ACL0, KC_ACL1, KC_ACL2, KC_NO  , KC_NO  , KC_ESC , KC_MS_U, KC_NO  , KC_NO, KC_NO,
-    KC_NO, KC_LCTL, KC_LALT, KC_LSFT, KC_NO  , KC_NO  , KC_NO  , KC_MS_L, KC_MS_D, KC_MS_R, KC_NO, KC_NO,
-    KC_NO, KC_NO   , KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_NO, KC_NO,
-    KC_WH_L, KC_BTN1, KC_WH_U, KC_WH_D, KC_BTN2, KC_WH_R
-  ),
-	[_LNUMBERS] = LAYOUT_split_3x6_3(
-    KC_LGUI, KC_LCTL, KC_LALT, KC_LSFT, KC_TRNS, KC_NO, KC_PSLS, KC_7, KC_8, KC_9, KC_PMNS, KC_BSPC,
-    KC_NO, KC_NO, KC_NO, KC_CALC, KC_NO, KC_NO, KC_PAST, KC_4, KC_5, KC_6, KC_PPLS, KC_DEL,
-    KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_1, KC_2, KC_3, KC_LPRN, KC_RPRN,
-    LSFT(KC_TAB), KC_TAB, KC_ENT, KC_SPC, KC_0, KC_PDOT
-    ),
-/* _MEDIA
- * ,-----------------------------------------------------------------------------------.
- * |      |Search| Back |Forwar|Refres|      |      |MediaP| TRAN |Brig U|Brig D|      |
- * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |      | Prev | Next |Rewind|FForwa|      |      |      |      |      |      |      |
- * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |      | Mute | Vol D| Vol U| Left | Right|      |      |      |      |      |      |
- * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |      |      |      |      | Play | Enter| Space| Stop |      |      |      |      |
- * `-----------------------------------------------------------------------------------'
- */
-	[_LMEDIA] = LAYOUT_split_3x6_3(
-    KC_NO, KC_WSCH, KC_WBAK, KC_WFWD, KC_WREF, KC_NO  , KC_NO , KC_MSEL, KC_TRNS, KC_BRIU, KC_BRID, KC_NO,
-    KC_NO, KC_MPRV, KC_MNXT, KC_MRWD, KC_MFFD, KC_NO  , KC_NO , KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_NO,
-    KC_NO, KC_MUTE, KC_VOLD, KC_VOLU, KC_LEFT, KC_RGHT, KC_NO , KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_NO,
-    KC_NO  , KC_MPLY, KC_ENT , KC_SPC, KC_MSTP, KC_NO
-  ),
-	[_LFUNCTIONKEYS] = LAYOUT_split_3x6_3(
-    KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_F7, KC_F8, KC_F9, KC_F12, KC_BSPC,
-    KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_F4, KC_F5, KC_F6, KC_F11, KC_DEL,
-    KC_LGUI, KC_LCTL, KC_LALT, KC_LSFT, KC_TRNS, KC_NO, KC_NO, KC_F1, KC_F2, KC_F3, KC_F10, KC_NO,
-    LSFT(KC_TAB), KC_TAB, KC_NO, KC_NO, KC_NO, KC_NO
-  )
+        [_LQWERTY] = LAYOUT_split_3x6_3(
+            KC_ESC ,             KC_Q, KC_W, KC_E,    CKC_LAY_NUMBERS_R,      KC_T,               KC_Y,   KC_U,   KC_I,                KC_O,   KC_P,    KC_BSPC,
+            CKC_LAY_RIGHT_THUMB, KC_A, KC_S, KC_D,    CKC_LAY_MOVEMENT_F,     KC_G,               KC_H,   KC_J,   KC_K,                KC_L,   KC_SCLN, KC_QUOT,
+            KC_LSFT,             KC_Z, KC_X, KC_C,    CKC_LAY_FUNCTIONKEYS_V, KC_B,               KC_N,   KC_M,   KC_COMM,             KC_DOT, KC_SLSH, KC_RSFT,
+                                                                      KC_LSFT,                CKC_LAY_LEFT_THUMB, KC_ENT, KC_SPC, CKC_LAY_RIGHT_THUMB, KC_RCTL
+        ),
+// /* _LLEFT_THUMB
+//  * ,-----------------------------------------------------------------------------------.
+//  * |      |   1  |   2  |   3  |   4  |   5  |   6  |   7  |   8  |   9  |   0  | Bksp |
+//  * |------+------+------+------+------+------+------+------+------+------+------+------|
+//  * |      |OsLCTL|OsLALT|OsLSHI|OsLGUI|      |      |OsRGUI|OsRSHI|OsRALT|OsRCTL|      |
+//  * |------+------+------+------+------+------+------+------+------+------+------+------|
+//  * |      |      |      |      |      |      |      |      |      |      |      |      |
+//  * |------+------+------+------+------+------+------+------+------+------+------+------|
+//  * | TRAN | TRAN | TRAN | TRAN | TRAN |      | Enter|MO(BT)| TRAN | TRAN | TRAN | TRAN |
+//  * `-----------------------------------------------------------------------------------'
+//  */
+// 	[_LLEFT_THUMB] = LAYOUT_split_3x6_3(
+//     KC_NO  , KC_1                 , KC_2   , KC_3   , KC_4   , KC_5 , KC_6               , KC_7             , KC_8         , KC_9         , KC_0         , KC_BSPC,
+//     KC_2   , CKC_ONESHOT_MODIFIER_LEFT_CTRL, CKC_ONESHOT_MODIFIER_LEFT_ALT, CKC_ONESHOT_MODIFIER_LEFT_SHIFT, CKC_ONESHOT_MODIFIER_LEFT_GUI, KC_NO, KC_NO, CKC_ONESHOT_MODIFIER_RIGHT_GUI, CKC_ONESHOT_MODIFIER_RIGHT_SHIFT, CKC_ONESHOT_MODIFIER_RIGHT_ALT, CKC_ONESHOT_MODIFIER_RIGHT_CTRL, KC_NO,
+//     KC_NO  , KC_NO, KC_NO  , KC_NO  , KC_NO  , KC_NO, KC_NO    , KC_NO            , KC_NO        , KC_NO        , KC_NO        , KC_NO,
+//     KC_TRNS, KC_TRNS, KC_NO, KC_ENT             , KC_NO, KC_TRNS
+//   ),
+// /* _LRIGHT_THUMB
+//  * ,-----------------------------------------------------------------------------------.
+//  * |      |   `  |   @  |   #  |   $  |   %  |   ^  |   [  |   ]  |   \  | Bksp |      |
+//  * |------+------+------+------+------+------+------+------+------+------+------+------|
+//  * |      |   <  |   >  |   {  |   }  |      |   _  |   (  |   )  |   :  |   =  |      |
+//  * |------+------+------+------+------+------+------+------+------+------+------+------|
+//  * |      |   &  |   |  |  !/¡ |  ?/¿ |   `  |   ~  |   /  |   *  |   -  |   +  |      |
+//  * |------+------+------+------+------+------+------+------+------+------+------+------|
+//  * | TRAN | TRAN | TRAN | TRAN |MO(BT)|      |      | TRAN | TRAN | TRAN | TRAN | TRAN |
+//  * `-----------------------------------------------------------------------------------'
+//  */
+// 	[_LRIGHT_THUMB] = LAYOUT_split_3x6_3(
+//     KC_NO  , KC_GRV , KC_AT  , KC_HASH,  KC_DLR           , KC_PERC              , KC_CIRC, KC_LBRC, KC_RBRC, KC_BSLS, KC_BSPC, KC_NO,
+//     KC_NO  , KC_LT  , KC_GT  , KC_LCBR,  KC_RCBR          , KC_NO                , KC_UNDS, KC_LPRN, KC_RPRN, KC_COLN, KC_EQL , KC_NO,
+//     KC_NO  , KC_AMPR, KC_PIPE, CKC_EXCL, CKC_QUES         , CKC_REPLACE_SHIFTED_2, KC_TILD, KC_SLSH, KC_ASTR, KC_MINS, KC_PLUS, KC_NO,
+//     KC_TRNS,  KC_NO, KC_NO                , KC_NO  , KC_TRNS, KC_TRNS
+//   ),
+// /* _LMOVEMENT
+//  * ,-----------------------------------------------------------------------------------.
+//  * |      |      |      |      |      |      | Home | PgUp | PgDo | End  | Bksp |      |
+//  * |------+------+------+------+------+------+------+------+------+------+------+------|
+//  * |      | LCtrl| LAlt |LShift| TRAN |      | Left | Down |  Up  | Righ | Del  |      |
+//  * |------+------+------+------+------+------+------+------+------+------+------+------|
+//  * |      |Ctrl C|Ctrl V|Ctrl X|      |      |      |      |      |      |      |      |
+//  * |------+------+------+------+------+------+------+------+------+------+------+------|
+//  * |      |      |      |S(TAB)|  TAB | ESC  | Space| Enter|  APP |      |      |      |
+//  * `-----------------------------------------------------------------------------------'
+//  */
+// 	[_LMOVEMENT] = LAYOUT_split_3x6_3(
+//     KC_NO, KC_NO     , KC_NO     , KC_NO           , KC_NO  , KC_NO , KC_HOME, KC_PGUP, KC_PGDN, KC_END,  KC_BSPC, KC_NO,
+//     KC_NO, KC_LCTL   , KC_LALT   , KC_LSFT         , KC_TRNS, KC_NO , KC_LEFT , KC_DOWN, KC_UP  , KC_RGHT, KC_DEL , KC_NO,
+//     KC_NO, LCTL(KC_C), LCTL(KC_V), LCTL(KC_X)      , KC_NO  , KC_NO , KC_NO   , KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_NO,
+//     LSFT(KC_TAB)    , KC_TAB , KC_ESC, KC_SPC  , KC_ENT , KC_APP
+//   ),
+// 	[_LMOVEMENT_RIGTH_PINK] = LAYOUT_split_3x6_3(
+//     KC_NO, LGUI(KC_TAB), RCS(KC_T)   , LCTL(KC_F4) , LALT(KC_F4), KC_NO  , LGUI(KC_M), LGUI(KC_R), KC_NO, LGUI(KC_E), KC_NO  , KC_NO,
+//     KC_NO, KC_LCTL     , KC_LALT     , KC_LSFT     , KC_LGUI    , KC_PSCR, KC_LEFT   , KC_DOWN   , KC_UP, KC_RGHT   , KC_TRNS, KC_NO,
+//     KC_NO, RCS(KC_TAB) , LCTL(KC_TAB), KC_NO       , KC_NO      , KC_NO  , KC_NO     , KC_NO     , KC_NO, KC_NO     , KC_NO  , KC_NO,
+//     LSFT(KC_TAB), KC_TAB     , KC_ESC , KC_NO     , KC_APP    , KC_NO
+//   ),
+// 	[_LMOUSE] = LAYOUT_split_3x6_3(
+//     KC_NO, KC_TRNS , KC_ACL0, KC_ACL1, KC_ACL2, KC_NO  , KC_NO  , KC_ESC , KC_MS_U, KC_NO  , KC_NO, KC_NO,
+//     KC_NO, KC_LCTL, KC_LALT, KC_LSFT, KC_NO  , KC_NO  , KC_NO  , KC_MS_L, KC_MS_D, KC_MS_R, KC_NO, KC_NO,
+//     KC_NO, KC_NO   , KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_NO, KC_NO,
+//     KC_WH_L, KC_BTN1, KC_WH_U, KC_WH_D, KC_BTN2, KC_WH_R
+//   ),
+// 	[_LNUMBERS] = LAYOUT_split_3x6_3(
+//     KC_LGUI, KC_LCTL, KC_LALT, KC_LSFT, KC_TRNS, KC_NO, KC_PSLS, KC_7, KC_8, KC_9, KC_PMNS, KC_BSPC,
+//     KC_NO, KC_NO, KC_NO, KC_CALC, KC_NO, KC_NO, KC_PAST, KC_4, KC_5, KC_6, KC_PPLS, KC_DEL,
+//     KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_1, KC_2, KC_3, KC_LPRN, KC_RPRN,
+//     LSFT(KC_TAB), KC_TAB, KC_ENT, KC_SPC, KC_0, KC_PDOT
+//     ),
+// /* _MEDIA
+//  * ,-----------------------------------------------------------------------------------.
+//  * |      |Search| Back |Forwar|Refres|      |      |MediaP| TRAN |Brig U|Brig D|      |
+//  * |------+------+------+------+------+------+------+------+------+------+------+------|
+//  * |      | Prev | Next |Rewind|FForwa|      |      |      |      |      |      |      |
+//  * |------+------+------+------+------+------+------+------+------+------+------+------|
+//  * |      | Mute | Vol D| Vol U| Left | Right|      |      |      |      |      |      |
+//  * |------+------+------+------+------+------+------+------+------+------+------+------|
+//  * |      |      |      |      | Play | Enter| Space| Stop |      |      |      |      |
+//  * `-----------------------------------------------------------------------------------'
+//  */
+// 	[_LMEDIA] = LAYOUT_split_3x6_3(
+//     KC_NO, KC_WSCH, KC_WBAK, KC_WFWD, KC_WREF, KC_NO  , KC_NO , KC_MSEL, KC_TRNS, KC_BRIU, KC_BRID, KC_NO,
+//     KC_NO, KC_MPRV, KC_MNXT, KC_MRWD, KC_MFFD, KC_NO  , KC_NO , KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_NO,
+//     KC_NO, KC_MUTE, KC_VOLD, KC_VOLU, KC_LEFT, KC_RGHT, KC_NO , KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_NO,
+//     KC_NO  , KC_MPLY, KC_ENT , KC_SPC, KC_MSTP, KC_NO
+//   ),
+// 	[_LFUNCTIONKEYS] = LAYOUT_split_3x6_3(
+//     KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_F7, KC_F8, KC_F9, KC_F12, KC_BSPC,
+//     KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_F4, KC_F5, KC_F6, KC_F11, KC_DEL,
+//     KC_LGUI, KC_LCTL, KC_LALT, KC_LSFT, KC_TRNS, KC_NO, KC_NO, KC_F1, KC_F2, KC_F3, KC_F10, KC_NO,
+//     LSFT(KC_TAB), KC_TAB, KC_NO, KC_NO, KC_NO, KC_NO
+//   )
 };
 
 void print_layer_status(void) {
@@ -199,12 +198,12 @@ void keyboard_post_init_user(void) {
  * | Gui  | Ctrl | Alt  | Shift|M_LTHU|Sh/ESC| Space|MO(RT)| Shift| Alt  | Ctrl | Caps |
  * `-----------------------------------------------------------------------------------'
  */
-    static const platform_keycode_t keymaps[4][8][6] = {
+    static const platform_keycode_t keymaps[6][8][6] = {
         [_LQWERTY] = LAYOUT_split_3x6_3(
-            KC_ESC ,             KC_Q, KC_W, KC_E,    KC_R,       KC_T,         KC_Y,   KC_U,   KC_I,          KC_O,   KC_P,    KC_BSPC,
-            CKC_LAY_RIGHT_THUMB, KC_A, KC_S, KC_D,    _LMOVEMENT, KC_G,         KC_H,   KC_J,   KC_K,          KC_L,   KC_SCLN, KC_QUOT,
-            KC_LSFT,             KC_Z, KC_X, KC_C,    KC_V,       KC_B,         KC_N,   KC_M,   KC_COMM,       KC_DOT, KC_SLSH, KC_RSFT,
-                                                                      KC_LSFT,    _LLEFT_THUMB, KC_ENT, KC_SPC, _LRIGHT_THUMB, KC_RCTL
+            KC_ESC ,             KC_Q, KC_W, KC_E,    CKC_LAY_NUMBERS_R,      KC_T,               KC_Y,   KC_U,   KC_I,                KC_O,   KC_P,    KC_BSPC,
+            CKC_LAY_RIGHT_THUMB, KC_A, KC_S, KC_D,    CKC_LAY_MOVEMENT_F,     KC_G,               KC_H,   KC_J,   KC_K,                KC_L,   KC_SCLN, KC_QUOT,
+            KC_LSFT,             KC_Z, KC_X, KC_C,    CKC_LAY_FUNCTIONKEYS_V, KC_B,               KC_N,   KC_M,   KC_COMM,             KC_DOT, KC_SLSH, KC_RSFT,
+                                                                      KC_LSFT,                CKC_LAY_LEFT_THUMB, KC_ENT, KC_SPC, CKC_LAY_RIGHT_THUMB, KC_RCTL
         ),
 /* _LLEFT_THUMB
  * ,-----------------------------------------------------------------------------------.
@@ -256,10 +255,74 @@ void keyboard_post_init_user(void) {
             KC_NO, KC_LCTL   , KC_LALT   , KC_LSFT         , KC_TRNS, KC_NO , KC_LEFT , KC_DOWN, KC_UP  , KC_RGHT, KC_DEL , KC_NO,
             KC_NO, LCTL(KC_C), LCTL(KC_V), LCTL(KC_X)      , KC_NO  , KC_NO , KC_NO   , KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_NO,
             LSFT(KC_TAB)    , KC_TAB , KC_ESC, KC_SPC  , KC_ENT , KC_APP
+        ),
+        [_LNUMBERS] = LAYOUT_split_3x6_3(
+            KC_LGUI, KC_LCTL, KC_LALT, KC_LSFT, KC_TRNS, KC_NO, KC_PSLS, KC_7, KC_8, KC_9, KC_PMNS, KC_BSPC,
+            KC_NO, KC_NO, KC_NO, KC_CALC, KC_NO, KC_NO, KC_PAST, KC_4, KC_5, KC_6, KC_PPLS, KC_DEL,
+            KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_1, KC_2, KC_3, KC_LPRN, KC_RPRN,
+            LSFT(KC_TAB), KC_TAB, KC_ENT, KC_SPC, KC_0, KC_PDOT
+        ),
+        [_LFUNCTIONKEYS] = LAYOUT_split_3x6_3(
+            KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_F7, KC_F8, KC_F9, KC_F12, KC_BSPC,
+            KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_F4, KC_F5, KC_F6, KC_F11, KC_DEL,
+            KC_LGUI, KC_LCTL, KC_LALT, KC_LSFT, KC_TRNS, KC_NO, KC_NO, KC_F1, KC_F2, KC_F3, KC_F10, KC_NO,
+            LSFT(KC_TAB), KC_TAB, KC_NO, KC_NO, KC_NO, KC_NO
         )
     };
-    platform_layout_init_2D_keymap((const uint16_t*)keymaps, 4, 8, 6);
-    pipeline_executor_create_config(0, 0);
+    platform_layout_init_2D_keymap((const uint16_t*)keymaps, 6, 8, 6);
+    pipeline_executor_create_config(1, 0);
+
+
+    pipeline_tap_dance_global_state_create();
+    size_t n_elements = 5;
+    pipeline_tap_dance_global_config_t* tap_dance_config = (pipeline_tap_dance_global_config_t*)(malloc(sizeof(*tap_dance_config) + n_elements * sizeof(pipeline_tap_dance_behaviour_t*)));
+    tap_dance_config->length = n_elements;
+
+    pipeline_executor_add_physical_pipeline(0, &pipeline_tap_dance_callback_process_data, &pipeline_tap_dance_callback_reset, tap_dance_config);
+
+
+    pipeline_tap_dance_action_config_t* actions_CKC_LAY_NUMBERS_R[] = {
+        createbehaviouraction_tap(1, KC_R),
+        createbehaviouraction_hold(1, _LNUMBERS, TAP_DANCE_BALANCED)
+    };
+    pipeline_tap_dance_behaviour_t* tap_dance_behavior_CKC_LAY_NUMBERS_R = createbehaviour(CKC_LAY_NUMBERS_R, actions_CKC_LAY_NUMBERS_R, 2);
+    tap_dance_behavior_CKC_LAY_NUMBERS_R->config->hold_timeout = 200; // Set hold timeout to 200ms
+    tap_dance_behavior_CKC_LAY_NUMBERS_R->config->tap_timeout = 200; // Set tap timeout to 200ms
+    tap_dance_config->behaviours[0] = tap_dance_behavior_CKC_LAY_NUMBERS_R;
+
+    pipeline_tap_dance_action_config_t* actions_CKC_LAY_MOVEMENT_F[] = {
+        createbehaviouraction_tap(1, KC_F),
+        createbehaviouraction_hold(1, _LMOVEMENT, TAP_DANCE_BALANCED)
+    };
+    pipeline_tap_dance_behaviour_t*  tap_dance_behavior_CKC_LAY_MOVEMENT_F = createbehaviour(CKC_LAY_MOVEMENT_F, actions_CKC_LAY_MOVEMENT_F, 2);
+    tap_dance_behavior_CKC_LAY_MOVEMENT_F->config->hold_timeout = 200; // Set hold timeout to 200ms
+    tap_dance_behavior_CKC_LAY_MOVEMENT_F->config->tap_timeout = 200; // Set tap timeout to 200ms
+    tap_dance_config->behaviours[1] = tap_dance_behavior_CKC_LAY_MOVEMENT_F;
+
+    pipeline_tap_dance_action_config_t* actions_CKC_LAY_FUNCTIONKEYS_V[] = {
+        createbehaviouraction_tap(1, KC_V),
+        createbehaviouraction_hold(1, _LFUNCTIONKEYS, TAP_DANCE_BALANCED)
+    };
+    pipeline_tap_dance_behaviour_t* tap_dance_behavior_CKC_LAY_FUNCTIONKEYS_V = createbehaviour(CKC_LAY_FUNCTIONKEYS_V, actions_CKC_LAY_FUNCTIONKEYS_V, 2);
+    tap_dance_behavior_CKC_LAY_FUNCTIONKEYS_V->config->hold_timeout = 200; // Set hold timeout to 200ms
+    tap_dance_behavior_CKC_LAY_FUNCTIONKEYS_V->config->tap_timeout = 200; // Set tap timeout to 200ms
+    tap_dance_config->behaviours[2] = tap_dance_behavior_CKC_LAY_FUNCTIONKEYS_V;
+
+    pipeline_tap_dance_action_config_t* actions_CKC_LAY_LEFT_THUMB[] = {
+        createbehaviouraction_hold(1, _LLEFT_THUMB, TAP_DANCE_BALANCED)
+    };
+    pipeline_tap_dance_behaviour_t* tap_dance_behavior_CKC_LAY_LEFT_THUMB = createbehaviour(CKC_LAY_LEFT_THUMB, actions_CKC_LAY_LEFT_THUMB, 1);
+    tap_dance_behavior_CKC_LAY_LEFT_THUMB->config->hold_timeout = 200; // Set hold timeout to 200ms
+    tap_dance_behavior_CKC_LAY_LEFT_THUMB->config->tap_timeout = 200; // Set tap timeout to 200ms
+    tap_dance_config->behaviours[3] = tap_dance_behavior_CKC_LAY_LEFT_THUMB;
+
+    pipeline_tap_dance_action_config_t* actions_CKC_LAY_RIGHT_THUMB[] = {
+        createbehaviouraction_hold(1, _LRIGHT_THUMB, TAP_DANCE_BALANCED)
+    };
+    pipeline_tap_dance_behaviour_t* tap_dance_behavior_CKC_LAY_RIGHT_THUMB = createbehaviour(CKC_LAY_RIGHT_THUMB, actions_CKC_LAY_RIGHT_THUMB, 1);
+    tap_dance_behavior_CKC_LAY_RIGHT_THUMB->config->hold_timeout = 200; // Set hold timeout to 200ms
+    tap_dance_behavior_CKC_LAY_RIGHT_THUMB->config->tap_timeout = 200; // Set tap timeout to 200ms
+    tap_dance_config->behaviours[4] = tap_dance_behavior_CKC_LAY_RIGHT_THUMB;
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -267,6 +330,47 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         uprintf("process_record_user     : kc: 0x%04X, col: %2u, row: %2u, pressed: %u, time: %5u, int: %u, count: %u, mods: %u, oneshot_mods:%u\n", keycode, record->event.key.col, record->event.key.row, record->event.pressed, record->event.time, record->tap.interrupted, record->tap.count, get_mods(), get_oneshot_mods());
     #endif
 
+    #if defined(FRAMEWORK_UNIT_TEST)
+        uprintf("FRAMEWORK_UNIT_TEST is defined\n");
+    #else
+        uprintf("FRAMEWORK_UNIT_TEST is not defined\n");
+    #endif
+
+    #if defined(FRAMEWORK_QMK)
+        uprintf("FRAMEWORK_QMK is defined\n");
+    #else
+        uprintf("FRAMEWORK_QMK is not defined\n");
+    #endif
+
+    #if defined(QMK_KEYBOARD)
+        uprintf("QMK_KEYBOARD is defined\n");
+    #else
+        uprintf("QMK_KEYBOARD is not defined\n");
+    #endif
+
+    #if defined(QUANTUM_H)
+        uprintf("QUANTUM_H is defined\n");
+    #else
+        uprintf("QUANTUM_H is not defined\n");
+    #endif
+
+    #if defined(DEBUG)
+        uprintf("DEBUG is defined\n");
+    #else
+        uprintf("DEBUG is not defined\n");
+    #endif
+
+    #if defined(CONSOLE_ENABLE)
+        uprintf("CONSOLE_ENABLE is defined\n");
+    #else
+        uprintf("CONSOLE_ENABLE is not defined\n");
+    #endif
+
+    #if defined(MONKEYBOARD_DEBUG)
+        uprintf("MONKEYBOARD_DEBUG is defined\n");
+    #else
+        uprintf("MONKEYBOARD_DEBUG is not defined\n");
+    #endif
     abskeyevent_t abskeyevent = {
         .keypos = {
             .col = record->event.key.col,

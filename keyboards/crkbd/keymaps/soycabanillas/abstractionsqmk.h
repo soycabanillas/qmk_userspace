@@ -1,36 +1,20 @@
 #pragma once
 
-// Platform detection
-#ifdef UNIT_TEST
-    #define CUSTOM_SAFE_RANGE 0x7E00
-#elif defined(QMK_KEYBOARD_H)
-    #include "quantum_keycodes.h"
-    #define CUSTOM_SAFE_RANGE SAFE_RANGE
-#elif defined(ZMK_INCLUDE_KERNEL_H)
-    #error "Unknown SAFE_RANGE for ZMK"
-#else
-    #error "Unknown platform"
-#endif
+#include "quantum_keycodes.h"
 
 // Custom Keycode Declarations
 enum planck_keycodes {
-  CKC_REMOVE_MODS = CUSTOM_SAFE_RANGE,
-  CKC_REMOVE_ONESHOTS,
-  CKC_RESET_TAPPINGTERM,
-  CKC_SET_TAPPINGTERM,
-  CKC_LAY_MOUSE_Q,
-  CKC_LAY_NUMBERS_R,
+  CKC_LAY_NUMBERS_R = SAFE_RANGE,
   CKC_LAY_MOVEMENT_F,
-  CKC_EXCL,
-  CKC_QUES,
+  CKC_LAY_FUNCTIONKEYS_V,
+  CKC_LAY_LEFT_THUMB,
   CKC_LAY_RIGHT_THUMB,
 
-  // Only for testing, remove later
+
+  CKC_EXCL,
+  CKC_QUES,
   CKC_LSHIFT_EXCLAMATION_MARK,
-  CKC_RSHIFT_QUESTION_MARK,
-  CKC_LAY_NUMBERS_S,
-  CKC_LAY_MOVEMENT_S,
-  CKC_LAY_RIGHT_THUMB_F,
+  CKC_LSHIFT_QUESTION_MARK,
 
 
   // Oneshot modifiers
