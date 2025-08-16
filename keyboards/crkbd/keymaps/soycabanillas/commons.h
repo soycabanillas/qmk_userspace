@@ -6,5 +6,6 @@ typedef enum  {
   _LRIGHT_THUMB,
   _LMOVEMENT,
   _LNUMBERS,
-  _LFUNCTIONKEYS
+  _LFUNCTIONKEYS,
+  _LMOVEMENT_RIGHT_PINK,
 } custom_layers;

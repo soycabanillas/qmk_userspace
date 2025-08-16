@@ -17,3 +17,15 @@
 #pragma once
 
 #define MASTER_LEFT
+
+// config.h
+// config.h
+#define NO_ACTION_LAYER          // Disables QMK layer system
+#define NO_ACTION_TAPPING        // Disables tap-hold processing
+#define NO_ACTION_ONESHOT        // Disables one-shot modifiers
+
+#define NO_TAPDANCE_ENABLE       // Disables tap dance feature
+
+#define NO_ACTION_MACRO          // Disables QMK macro system
+#define NO_ACTION_FUNCTION       // Disables function key actions
+#define DISABLE_LEADER           // Disables leader key sequences
