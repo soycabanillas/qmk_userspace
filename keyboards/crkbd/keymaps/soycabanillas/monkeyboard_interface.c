@@ -4,6 +4,7 @@
 #include "modules/soycabanillas/src/platform_interface.h"
 #include "modules/soycabanillas/src/platform_types.h"
 #include "modules/soycabanillas/src/platform_layout.h"
+#include "quantum.h"
 
 
 // Key operations
@@ -14,11 +15,11 @@ void platform_tap_keycode(platform_keycode_t keycode) {
 }
 
 void platform_register_keycode(platform_keycode_t keycode) {
-    register_code(keycode);
+    register_code16(keycode);
 }
 
 void platform_unregister_keycode(platform_keycode_t keycode) {
-    unregister_code(keycode);
+    unregister_code16(keycode);
 }
 
 void platform_add_key(platform_keycode_t keycode) {

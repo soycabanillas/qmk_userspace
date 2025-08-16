@@ -275,8 +275,9 @@ void keyboard_post_init_user(void) {
 
     pipeline_tap_dance_global_state_create();
     size_t n_elements = 5;
-    pipeline_tap_dance_global_config_t* tap_dance_config = (pipeline_tap_dance_global_config_t*)(malloc(sizeof(*tap_dance_config) + n_elements * sizeof(pipeline_tap_dance_behaviour_t*)));
+    pipeline_tap_dance_global_config_t* tap_dance_config = (pipeline_tap_dance_global_config_t*)malloc(sizeof(pipeline_tap_dance_global_config_t));
     tap_dance_config->length = n_elements;
+    tap_dance_config->behaviours = (pipeline_tap_dance_behaviour_t**)malloc(n_elements * sizeof(pipeline_tap_dance_behaviour_t*));
 
     pipeline_executor_add_physical_pipeline(0, &pipeline_tap_dance_callback_process_data, &pipeline_tap_dance_callback_reset, tap_dance_config);
 
