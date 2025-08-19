@@ -165,7 +165,7 @@ const uint16_t PROGMEM keymaps[][1][1] = {{{0}}};
 
 void add_hold_tap(void) {
     pipeline_tap_dance_global_state_create();
-    size_t n_elements = 5;
+    size_t n_elements = 6;
     pipeline_tap_dance_global_config_t* tap_dance_config = (pipeline_tap_dance_global_config_t*)malloc(sizeof(pipeline_tap_dance_global_config_t));
     tap_dance_config->length = n_elements;
     tap_dance_config->behaviours = (pipeline_tap_dance_behaviour_t**)malloc(n_elements * sizeof(pipeline_tap_dance_behaviour_t*));
@@ -200,21 +200,30 @@ void add_hold_tap(void) {
     tap_dance_behavior_CKC_LAY_FUNCTIONKEYS_V->config->tap_timeout = 200; // Set tap timeout to 200ms
     tap_dance_config->behaviours[2] = tap_dance_behavior_CKC_LAY_FUNCTIONKEYS_V;
 
+    pipeline_tap_dance_action_config_t* actions_CKC_LAY_MOVEMENT_RIGHT_SCLN[] = {
+        createbehaviouraction_tap(1, KC_SCLN),
+        createbehaviouraction_hold(1, _LMOVEMENT_RIGHT_PINK, TAP_DANCE_BALANCED)
+    };
+    pipeline_tap_dance_behaviour_t* tap_dance_behavior_CKC_LAY_MOVEMENT_RIGHT_SCLN = createbehaviour(CKC_LAY_MOVEMENT_RIGHT_SCLN, actions_CKC_LAY_MOVEMENT_RIGHT_SCLN, 2);
+    tap_dance_behavior_CKC_LAY_MOVEMENT_RIGHT_SCLN->config->hold_timeout = 200; // Set hold timeout to 200ms
+    tap_dance_behavior_CKC_LAY_MOVEMENT_RIGHT_SCLN->config->tap_timeout = 200; // Set tap timeout to 200ms
+    tap_dance_config->behaviours[3] = tap_dance_behavior_CKC_LAY_MOVEMENT_RIGHT_SCLN;
+
     pipeline_tap_dance_action_config_t* actions_CKC_LAY_LEFT_THUMB[] = {
-        createbehaviouraction_hold(1, _LLEFT_THUMB, TAP_DANCE_BALANCED)
+        createbehaviouraction_hold(1, _LLEFT_THUMB, TAP_DANCE_HOLD_PREFERRED)
     };
     pipeline_tap_dance_behaviour_t* tap_dance_behavior_CKC_LAY_LEFT_THUMB = createbehaviour(CKC_LAY_LEFT_THUMB, actions_CKC_LAY_LEFT_THUMB, 1);
     tap_dance_behavior_CKC_LAY_LEFT_THUMB->config->hold_timeout = 200; // Set hold timeout to 200ms
     tap_dance_behavior_CKC_LAY_LEFT_THUMB->config->tap_timeout = 200; // Set tap timeout to 200ms
-    tap_dance_config->behaviours[3] = tap_dance_behavior_CKC_LAY_LEFT_THUMB;
+    tap_dance_config->behaviours[4] = tap_dance_behavior_CKC_LAY_LEFT_THUMB;
 
     pipeline_tap_dance_action_config_t* actions_CKC_LAY_RIGHT_THUMB[] = {
-        createbehaviouraction_hold(1, _LRIGHT_THUMB, TAP_DANCE_BALANCED)
+        createbehaviouraction_hold(1, _LRIGHT_THUMB, TAP_DANCE_HOLD_PREFERRED)
     };
     pipeline_tap_dance_behaviour_t* tap_dance_behavior_CKC_LAY_RIGHT_THUMB = createbehaviour(CKC_LAY_RIGHT_THUMB, actions_CKC_LAY_RIGHT_THUMB, 1);
     tap_dance_behavior_CKC_LAY_RIGHT_THUMB->config->hold_timeout = 200; // Set hold timeout to 200ms
     tap_dance_behavior_CKC_LAY_RIGHT_THUMB->config->tap_timeout = 200; // Set tap timeout to 200ms
-    tap_dance_config->behaviours[4] = tap_dance_behavior_CKC_LAY_RIGHT_THUMB;
+    tap_dance_config->behaviours[5] = tap_dance_behavior_CKC_LAY_RIGHT_THUMB;
 }
 
 void add_one_shot_modifiers(void) {
@@ -278,10 +287,10 @@ void keyboard_post_init_user(void) {
  */
     static const platform_keycode_t keymaps[][8][6] = {
         [_LQWERTY] = LAYOUT_split_3x6_3(
-            KC_ESC ,             KC_Q, KC_W, KC_E,    CKC_LAY_NUMBERS_R,      KC_T,               KC_Y,   KC_U,   KC_I,                KC_O,   KC_P,    KC_BSPC,
-            CKC_LAY_RIGHT_THUMB, KC_A, KC_S, KC_D,    CKC_LAY_MOVEMENT_F,     KC_G,               KC_H,   KC_J,   KC_K,                KC_L,   CKC_LAY_MOVEMENT_RIGHT_SCLN, KC_QUOT,
-            KC_LSFT,             KC_Z, KC_X, KC_C,    CKC_LAY_FUNCTIONKEYS_V, KC_B,               KC_N,   KC_M,   KC_COMM,             KC_DOT, KC_SLSH, KC_RSFT,
-                                                                      KC_LSFT,                CKC_LAY_LEFT_THUMB, KC_ENT, KC_SPC, CKC_LAY_RIGHT_THUMB, KC_RCTL
+            KC_ESC,  KC_Q, KC_W, KC_E, CKC_LAY_NUMBERS_R,      KC_T,               KC_Y,   KC_U,   KC_I,                KC_O,   KC_P,                        KC_BSPC,
+            KC_NO,   KC_A, KC_S, KC_D, CKC_LAY_MOVEMENT_F,     KC_G,               KC_H,   KC_J,   KC_K,                KC_L,   CKC_LAY_MOVEMENT_RIGHT_SCLN, KC_QUOT,
+            KC_LSFT, KC_Z, KC_X, KC_C, CKC_LAY_FUNCTIONKEYS_V, KC_B,               KC_N,   KC_M,   KC_COMM,             KC_DOT, KC_SLSH,                     KC_RSFT,
+                                       KC_LSFT,                CKC_LAY_LEFT_THUMB, KC_ENT, KC_SPC, CKC_LAY_RIGHT_THUMB, KC_RCTL
         ),
 /* _LLEFT_THUMB
  * ,-----------------------------------------------------------------------------------.
@@ -345,15 +354,15 @@ void keyboard_post_init_user(void) {
             KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_F4, KC_F5, KC_F6, KC_F11, KC_DEL,
             KC_LGUI, KC_LCTL, KC_LALT, KC_LSFT, KC_TRNS, KC_NO, KC_NO, KC_F1, KC_F2, KC_F3, KC_F10, KC_NO,
             LSFT(KC_TAB), KC_TAB, KC_NO, KC_NO, KC_NO, KC_NO
-        )//,
-        // [_LMOVEMENT_RIGHT_PINK] = LAYOUT_split_3x6_3(
-        //     KC_NO, LGUI(KC_TAB), RCS(KC_T)   , LCTL(KC_F4) , LALT(KC_F4), KC_NO  , LGUI(KC_M), LGUI(KC_R), KC_NO, LGUI(KC_E), KC_NO  , KC_NO,
-        //     KC_NO, KC_LCTL     , KC_LALT     , KC_LSFT     , KC_LGUI    , KC_PSCR, KC_LEFT   , KC_DOWN   , KC_UP, KC_RGHT   , KC_TRNS, KC_NO,
-        //     KC_NO, RCS(KC_TAB) , LCTL(KC_TAB), KC_NO       , KC_NO      , KC_NO  , KC_NO     , KC_NO     , KC_NO, KC_NO     , KC_NO  , KC_NO,
-        //     LSFT(KC_TAB), KC_TAB     , KC_ESC , KC_NO     , KC_APP    , KC_NO
-        // ),
+        ),
+        [_LMOVEMENT_RIGHT_PINK] = LAYOUT_split_3x6_3(
+            KC_NO, LGUI(KC_TAB), RCS(KC_T)   , LCTL(KC_F4) , LALT(KC_F4), KC_NO  , LGUI(KC_M), LGUI(KC_R), KC_NO, LGUI(KC_E), KC_NO  , KC_NO,
+            KC_NO, KC_LCTL     , KC_LALT     , KC_LSFT     , KC_LGUI    , KC_PSCR, KC_LEFT   , KC_DOWN   , KC_UP, KC_RGHT   , KC_TRNS, KC_NO,
+            KC_NO, RCS(KC_TAB) , LCTL(KC_TAB), KC_NO       , KC_NO      , KC_NO  , KC_NO     , KC_NO     , KC_NO, KC_NO     , KC_NO  , KC_NO,
+            LSFT(KC_TAB), KC_TAB     , KC_ESC , KC_NO     , KC_APP    , KC_NO
+        ),
     };
-    platform_layout_init_2D_keymap((const uint16_t*)keymaps, 6, 8, 6);
+    platform_layout_init_2D_keymap((const uint16_t*)keymaps, 7, 8, 6);
     pipeline_executor_create_config(1, 1);
 
     add_hold_tap();
