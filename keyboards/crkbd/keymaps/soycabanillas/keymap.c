@@ -170,7 +170,7 @@ void add_hold_tap(void) {
     tap_dance_config->length = n_elements;
     tap_dance_config->behaviours = (pipeline_tap_dance_behaviour_t**)malloc(n_elements * sizeof(pipeline_tap_dance_behaviour_t*));
 
-    pipeline_executor_add_physical_pipeline(0, &pipeline_tap_dance_callback_process_data, &pipeline_tap_dance_callback_reset, tap_dance_config);
+    pipeline_executor_add_physical_pipeline(0, &pipeline_tap_dance_callback_process_data_executor, &pipeline_tap_dance_callback_reset_executor, tap_dance_config);
 
 
     pipeline_tap_dance_action_config_t* actions_CKC_LAY_NUMBERS_R[] = {
@@ -243,7 +243,7 @@ void add_one_shot_modifiers(void) {
     pipeline_oneshot_modifier_global_t* global = malloc(sizeof(pipeline_oneshot_modifier_global_t));
     global->config = global_config;
     global->status = global_status;
-    pipeline_executor_add_virtual_pipeline(0, &pipeline_oneshot_modifier_callback_process_data, &pipeline_oneshot_modifier_callback_reset, global);
+    pipeline_executor_add_virtual_pipeline(0, &pipeline_oneshot_modifier_callback_process_data_executor, &pipeline_oneshot_modifier_callback_reset_executor, global);
 }
 
 void keyboard_post_init_user(void) {
