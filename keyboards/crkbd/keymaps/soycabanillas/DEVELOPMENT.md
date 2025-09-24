@@ -36,12 +36,14 @@ QMK Build System → compile_commands.json → clangd → VS Code Extension → 
 ```bash
 # Regenerates compile_commands.json for updated IntelliSense
 qmk compile -kb crkbd -km soycabanillas --compiledb
+qmk compile -kb crkbd/rev1 -km soycabanillas --compiledb
 ```
 
 ### For Regular Development:
 ```bash
 # Faster incremental builds
 make crkbd:soycabanillas
+make crkbd/rev1:soycabanillas
 ```
 
 ### For C++ Tests:

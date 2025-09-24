@@ -16,6 +16,8 @@
 
 
 #include "modules/soycabanillas/src/monkeyboard_deferred_callbacks.h"
+#include "modules/soycabanillas/src/pipeline_combo.h"
+#include "modules/soycabanillas/src/pipeline_combo_initializer.h"
 #include "modules/soycabanillas/src/pipeline_tap_dance.h"
 #include "modules/soycabanillas/src/pipeline_tap_dance_initializer.h"
 #include "modules/soycabanillas/src/pipeline_oneshot_modifier.h"
@@ -163,14 +165,14 @@
 
 const uint16_t PROGMEM keymaps[][1][1] = {{{0}}};
 
-void add_hold_tap(void) {
+void add_hold_tap(uint8_t pipeline_index) {
     pipeline_tap_dance_global_state_create();
     size_t n_elements = 6;
     pipeline_tap_dance_global_config_t* tap_dance_config = (pipeline_tap_dance_global_config_t*)malloc(sizeof(pipeline_tap_dance_global_config_t));
     tap_dance_config->length = n_elements;
     tap_dance_config->behaviours = (pipeline_tap_dance_behaviour_t**)malloc(n_elements * sizeof(pipeline_tap_dance_behaviour_t*));
 
-    pipeline_executor_add_physical_pipeline(0, &pipeline_tap_dance_callback_process_data_executor, &pipeline_tap_dance_callback_reset_executor, tap_dance_config);
+    pipeline_executor_add_physical_pipeline(pipeline_index, &pipeline_tap_dance_callback_process_data_executor, &pipeline_tap_dance_callback_reset_executor, tap_dance_config);
 
 
     pipeline_tap_dance_action_config_t* actions_CKC_LAY_NUMBERS_R[] = {
@@ -226,7 +228,7 @@ void add_hold_tap(void) {
     tap_dance_config->behaviours[5] = tap_dance_behavior_CKC_LAY_RIGHT_THUMB;
 }
 
-void add_one_shot_modifiers(void) {
+void add_one_shot_modifiers(uint8_t pipeline_index) {
     size_t number_of_pairs = 8;
     pipeline_oneshot_modifier_global_status_t* global_status = pipeline_oneshot_modifier_global_state_create();
     pipeline_oneshot_modifier_global_config_t* global_config = (pipeline_oneshot_modifier_global_config_t*)(malloc(sizeof(*global_config)));
@@ -243,7 +245,36 @@ void add_one_shot_modifiers(void) {
     pipeline_oneshot_modifier_global_t* global = malloc(sizeof(pipeline_oneshot_modifier_global_t));
     global->config = global_config;
     global->status = global_status;
-    pipeline_executor_add_virtual_pipeline(0, &pipeline_oneshot_modifier_callback_process_data_executor, &pipeline_oneshot_modifier_callback_reset_executor, global);
+    pipeline_executor_add_virtual_pipeline(pipeline_index, &pipeline_oneshot_modifier_callback_process_data_executor, &pipeline_oneshot_modifier_callback_reset_executor, global);
+}
+
+void add_combo(uint8_t pipeline_index) {
+    pipeline_combo_global_state_create();
+    size_t n_elements = 1;
+    pipeline_combo_global_config_t* combo_config = (pipeline_combo_global_config_t*)malloc(sizeof(*combo_config));
+    combo_config->length = n_elements;
+    combo_config->combos = (pipeline_combo_config_t**)malloc(n_elements * sizeof(pipeline_combo_config_t*));
+    combo_config->strategy = COMBO_STRATEGY_DISCARD_WHEN_ONE_PRESSED_IN_COMMON;
+
+    pipeline_executor_add_physical_pipeline(pipeline_index, &pipeline_combo_callback_process_data_executor, &pipeline_combo_callback_reset_executor, combo_config);
+
+    pipeline_combo_key_translation_t press_action_none = create_combo_key_action(COMBO_KEY_ACTION_NONE, 0);
+    pipeline_combo_key_translation_t release_action_none = create_combo_key_action(COMBO_KEY_ACTION_NONE, 0);
+
+    // Define a combo: pressing 'A' and 'S' together sends 'ESC'
+    platform_keypos_t keypos_a = { .row = 0, .col = 1 }; // Example key position
+    pipeline_combo_key_t* combo_key_a = create_combo_key(keypos_a, press_action_none, release_action_none);
+
+    platform_keypos_t keypos_b = { .row = 0, .col = 2 }; // Example key position
+    pipeline_combo_key_t* combo_key_b = create_combo_key(keypos_b, press_action_none, release_action_none);
+
+    pipeline_combo_key_t* combo1_keys[] = { combo_key_a, combo_key_b };
+
+    pipeline_combo_key_translation_t press_action_combo1 = create_combo_key_action(COMBO_KEY_ACTION_REGISTER, KC_AT);
+    pipeline_combo_key_translation_t release_action_combo1 = create_combo_key_action(COMBO_KEY_ACTION_UNREGISTER, KC_AT);
+
+    pipeline_combo_config_t* combo1 = create_combo(2, combo1_keys, press_action_combo1, release_action_combo1);
+    combo_config->combos[0] = combo1;
 }
 
 void keyboard_post_init_user(void) {
@@ -363,10 +394,11 @@ void keyboard_post_init_user(void) {
         ),
     };
     platform_layout_init_2D_keymap((const uint16_t*)keymaps, 7, 8, 6);
-    pipeline_executor_create_config(1, 1);
+    pipeline_executor_create_config(2, 1);
 
-    add_hold_tap();
-    add_one_shot_modifiers();
+    add_combo(0);
+    add_hold_tap(1);
+    add_one_shot_modifiers(0);
 
 }
 
