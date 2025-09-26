@@ -24,6 +24,7 @@
 #include "modules/soycabanillas/src/pipeline_oneshot_modifier_initializer.h"
 #include "modules/soycabanillas/src/pipeline_executor.h"
 #include "modules/soycabanillas/src/platform_interface.h"
+#include "modules/soycabanillas/src/platform_types.h"
 #include QMK_KEYBOARD_H
 // #include "print.h"
 #include "commons.h"
@@ -165,6 +166,84 @@
 
 const uint16_t PROGMEM keymaps[][1][1] = {{{0}}};
 
+const platform_keycode_t PROGMEM my_keymaps[][8][6] = {
+        [_LQWERTY] = LAYOUT_split_3x6_3(
+            KC_ESC,  KC_Q, KC_W, KC_E, CKC_LAY_NUMBERS_R,      KC_T,               KC_Y,   KC_U,   KC_I,                KC_O,   KC_P,                        KC_BSPC,
+            KC_NO,   KC_A, KC_S, KC_D, CKC_LAY_MOVEMENT_F,     KC_G,               KC_H,   KC_J,   KC_K,                KC_L,   CKC_LAY_MOVEMENT_RIGHT_SCLN, KC_QUOT,
+            KC_LSFT, KC_Z, KC_X, KC_C, CKC_LAY_FUNCTIONKEYS_V, KC_B,               KC_N,   KC_M,   KC_COMM,             KC_DOT, KC_SLSH,                     KC_RSFT,
+                                       KC_LSFT,                CKC_LAY_LEFT_THUMB, KC_ENT, KC_SPC, CKC_LAY_RIGHT_THUMB, KC_RCTL
+        ),
+/* _LLEFT_THUMB
+ * ,-----------------------------------------------------------------------------------.
+ * |      |   1  |   2  |   3  |   4  |   5  |   6  |   7  |   8  |   9  |   0  | Bksp |
+ * |------+------+------+------+------+------+------+------+------+------+------+------|
+ * |      |OsLCTL|OsLALT|OsLSHI|OsLGUI|      |      |OsRGUI|OsRSHI|OsRALT|OsRCTL|      |
+ * |------+------+------+------+------+------+------+------+------+------+------+------|
+ * |      |      |      |      |      |      |      |      |      |      |      |      |
+ * |------+------+------+------+------+------+------+------+------+------+------+------|
+ * | TRAN | TRAN | TRAN | TRAN | TRAN |      | Enter|MO(BT)| TRAN | TRAN | TRAN | TRAN |
+ * `-----------------------------------------------------------------------------------'
+ */
+        [_LLEFT_THUMB] = LAYOUT_split_3x6_3(
+            KC_NO, KC_1                 , KC_2   , KC_3   , KC_4   , KC_5 , KC_6               , KC_7             , KC_8         , KC_9         , KC_0         , KC_BSPC,
+            KC_NO, CKC_ONESHOT_MODIFIER_LEFT_CTRL, CKC_ONESHOT_MODIFIER_LEFT_ALT, CKC_ONESHOT_MODIFIER_LEFT_SHIFT, CKC_ONESHOT_MODIFIER_LEFT_GUI, KC_NO, KC_NO, CKC_ONESHOT_MODIFIER_RIGHT_GUI, CKC_ONESHOT_MODIFIER_RIGHT_SHIFT, CKC_ONESHOT_MODIFIER_RIGHT_ALT, CKC_ONESHOT_MODIFIER_RIGHT_CTRL, KC_NO,
+            KC_NO, KC_NO, KC_NO  , KC_NO  , KC_NO  , KC_NO, KC_NO    , KC_NO            , KC_NO        , KC_NO        , KC_NO        , KC_NO,
+            KC_NO, KC_NO, KC_NO, KC_ENT             , KC_NO, KC_TRNS
+        ),
+/* _LRIGHT_THUMB
+* ,-----------------------------------------------------------------------------------.
+* |      |   `  |   @  |   #  |   $  |   %  |   ^  |   [  |   ]  |   \  | Bksp |      |
+* |------+------+------+------+------+------+------+------+------+------+------+------|
+* |      |   <  |   >  |   {  |   }  |      |   _  |   (  |   )  |   :  |   =  |      |
+* |------+------+------+------+------+------+------+------+------+------+------+------|
+* |      |   &  |   |  |  !/¡ |  ?/¿ |   `  |   ~  |   /  |   *  |   -  |   +  |      |
+* |------+------+------+------+------+------+------+------+------+------+------+------|
+* | TRAN | TRAN | TRAN | TRAN |MO(BT)|      |      | TRAN | TRAN | TRAN | TRAN | TRAN |
+* `-----------------------------------------------------------------------------------'
+*/
+        [_LRIGHT_THUMB] = LAYOUT_split_3x6_3(
+            KC_NO  , KC_GRV , KC_AT  , KC_HASH,  KC_DLR           , KC_PERC              , KC_CIRC, KC_LBRC, KC_RBRC, KC_BSLS, KC_BSPC, KC_NO,
+            KC_NO  , KC_LT  , KC_GT  , KC_LCBR,  KC_RCBR          , KC_NO                , KC_UNDS, KC_LPRN, KC_RPRN, KC_COLN, KC_EQL , KC_NO,
+            KC_NO  , KC_AMPR, KC_PIPE, CKC_EXCL, CKC_QUES         , CKC_REPLACE_SHIFTED_2, KC_TILD, KC_SLSH, KC_ASTR, KC_MINS, KC_PLUS, KC_NO,
+            KC_TRNS,  KC_NO, KC_NO                , KC_NO  , KC_TRNS, KC_TRNS
+        ),
+/* _LMOVEMENT
+ * ,-----------------------------------------------------------------------------------.
+ * |      |      |      |      |      |      | Home | PgUp | PgDo | End  | Bksp |      |
+ * |------+------+------+------+------+------+------+------+------+------+------+------|
+ * |      | LCtrl| LAlt |LShift| TRAN |      | Left | Down |  Up  | Righ | Del  |      |
+ * |------+------+------+------+------+------+------+------+------+------+------+------|
+ * |      |Ctrl C|Ctrl V|Ctrl X|      |      |      |      |      |      |      |      |
+ * |------+------+------+------+------+------+------+------+------+------+------+------|
+ * |      |      |      |S(TAB)|  TAB | ESC  | Space| Enter|  APP |      |      |      |
+ * `-----------------------------------------------------------------------------------'
+ */
+        [_LMOVEMENT] = LAYOUT_split_3x6_3(
+            KC_NO, KC_NO     , KC_NO     , KC_NO           , KC_NO  , KC_NO , KC_HOME, KC_PGUP, KC_PGDN, KC_END,  KC_BSPC, KC_NO,
+            KC_NO, KC_LCTL   , KC_LALT   , KC_LSFT         , KC_TRNS, KC_NO , KC_LEFT , KC_DOWN, KC_UP  , KC_RGHT, KC_DEL , KC_NO,
+            KC_NO, LCTL(KC_C), LCTL(KC_V), LCTL(KC_X)      , KC_NO  , KC_NO , KC_NO   , KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_NO,
+            LSFT(KC_TAB)    , KC_TAB , KC_ESC, KC_SPC  , KC_ENT , KC_APP
+        ),
+        [_LNUMBERS] = LAYOUT_split_3x6_3(
+            KC_LGUI, KC_LCTL, KC_LALT, KC_LSFT, KC_TRNS, KC_NO, KC_PSLS, KC_7, KC_8, KC_9, KC_PMNS, KC_BSPC,
+            KC_NO, KC_NO, KC_NO, KC_CALC, KC_NO, KC_NO, KC_PAST, KC_4, KC_5, KC_6, KC_PPLS, KC_DEL,
+            KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_1, KC_2, KC_3, KC_LPRN, KC_RPRN,
+            LSFT(KC_TAB), KC_TAB, KC_ENT, KC_SPC, KC_0, KC_PDOT
+        ),
+        [_LFUNCTIONKEYS] = LAYOUT_split_3x6_3(
+            KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_F7, KC_F8, KC_F9, KC_F12, KC_BSPC,
+            KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_F4, KC_F5, KC_F6, KC_F11, KC_DEL,
+            KC_LGUI, KC_LCTL, KC_LALT, KC_LSFT, KC_TRNS, KC_NO, KC_NO, KC_F1, KC_F2, KC_F3, KC_F10, KC_NO,
+            LSFT(KC_TAB), KC_TAB, KC_NO, KC_NO, KC_NO, KC_NO
+        ),
+        [_LMOVEMENT_RIGHT_PINK] = LAYOUT_split_3x6_3(
+            KC_NO, LGUI(KC_TAB), RCS(KC_T)   , LCTL(KC_F4) , LALT(KC_F4), KC_NO  , LGUI(KC_M), LGUI(KC_R), KC_NO, LGUI(KC_E), KC_NO  , KC_NO,
+            KC_NO, KC_LCTL     , KC_LALT     , KC_LSFT     , KC_LGUI    , KC_PSCR, KC_LEFT   , KC_DOWN   , KC_UP, KC_RGHT   , KC_TRNS, KC_NO,
+            KC_NO, RCS(KC_TAB) , LCTL(KC_TAB), KC_NO       , KC_NO      , KC_NO  , KC_NO     , KC_NO     , KC_NO, KC_NO     , KC_NO  , KC_NO,
+            LSFT(KC_TAB), KC_TAB     , KC_ESC , KC_NO     , KC_APP    , KC_NO
+        ),
+};
+
 void add_hold_tap(uint8_t pipeline_index) {
     pipeline_tap_dance_global_state_create();
     size_t n_elements = 6;
@@ -277,6 +356,13 @@ void add_combo(uint8_t pipeline_index) {
     combo_config->combos[0] = combo1;
 }
 
+static platform_keycode_t get_keycode_from_layer(uint8_t layer, platform_keypos_t position) {
+    if (layer >= sizeof(my_keymaps) / sizeof(my_keymaps[0]) || position.row >= MATRIX_ROWS || position.col >= MATRIX_COLS) {
+        return 0;
+    }
+    return (platform_keycode_t) pgm_read_dword(&my_keymaps[layer][position.row][position.col]);
+}
+
 void keyboard_post_init_user(void) {
   debug_enable=false;
   //debug_matrix=true;
@@ -316,84 +402,10 @@ void keyboard_post_init_user(void) {
  * | Gui  | Ctrl | Alt  | Shift|M_LTHU|Sh/ESC| Space|MO(RT)| Shift| Alt  | Ctrl | Caps |
  * `-----------------------------------------------------------------------------------'
  */
-    static const platform_keycode_t keymaps[][8][6] = {
-        [_LQWERTY] = LAYOUT_split_3x6_3(
-            KC_ESC,  KC_Q, KC_W, KC_E, CKC_LAY_NUMBERS_R,      KC_T,               KC_Y,   KC_U,   KC_I,                KC_O,   KC_P,                        KC_BSPC,
-            KC_NO,   KC_A, KC_S, KC_D, CKC_LAY_MOVEMENT_F,     KC_G,               KC_H,   KC_J,   KC_K,                KC_L,   CKC_LAY_MOVEMENT_RIGHT_SCLN, KC_QUOT,
-            KC_LSFT, KC_Z, KC_X, KC_C, CKC_LAY_FUNCTIONKEYS_V, KC_B,               KC_N,   KC_M,   KC_COMM,             KC_DOT, KC_SLSH,                     KC_RSFT,
-                                       KC_LSFT,                CKC_LAY_LEFT_THUMB, KC_ENT, KC_SPC, CKC_LAY_RIGHT_THUMB, KC_RCTL
-        ),
-/* _LLEFT_THUMB
- * ,-----------------------------------------------------------------------------------.
- * |      |   1  |   2  |   3  |   4  |   5  |   6  |   7  |   8  |   9  |   0  | Bksp |
- * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |      |OsLCTL|OsLALT|OsLSHI|OsLGUI|      |      |OsRGUI|OsRSHI|OsRALT|OsRCTL|      |
- * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |      |      |      |      |      |      |      |      |      |      |      |      |
- * |------+------+------+------+------+------+------+------+------+------+------+------|
- * | TRAN | TRAN | TRAN | TRAN | TRAN |      | Enter|MO(BT)| TRAN | TRAN | TRAN | TRAN |
- * `-----------------------------------------------------------------------------------'
- */
-        [_LLEFT_THUMB] = LAYOUT_split_3x6_3(
-            KC_NO, KC_1                 , KC_2   , KC_3   , KC_4   , KC_5 , KC_6               , KC_7             , KC_8         , KC_9         , KC_0         , KC_BSPC,
-            KC_NO, CKC_ONESHOT_MODIFIER_LEFT_CTRL, CKC_ONESHOT_MODIFIER_LEFT_ALT, CKC_ONESHOT_MODIFIER_LEFT_SHIFT, CKC_ONESHOT_MODIFIER_LEFT_GUI, KC_NO, KC_NO, CKC_ONESHOT_MODIFIER_RIGHT_GUI, CKC_ONESHOT_MODIFIER_RIGHT_SHIFT, CKC_ONESHOT_MODIFIER_RIGHT_ALT, CKC_ONESHOT_MODIFIER_RIGHT_CTRL, KC_NO,
-            KC_NO, KC_NO, KC_NO  , KC_NO  , KC_NO  , KC_NO, KC_NO    , KC_NO            , KC_NO        , KC_NO        , KC_NO        , KC_NO,
-            KC_NO, KC_NO, KC_NO, KC_ENT             , KC_NO, KC_TRNS
-        ),
-/* _LRIGHT_THUMB
-* ,-----------------------------------------------------------------------------------.
-* |      |   `  |   @  |   #  |   $  |   %  |   ^  |   [  |   ]  |   \  | Bksp |      |
-* |------+------+------+------+------+------+------+------+------+------+------+------|
-* |      |   <  |   >  |   {  |   }  |      |   _  |   (  |   )  |   :  |   =  |      |
-* |------+------+------+------+------+------+------+------+------+------+------+------|
-* |      |   &  |   |  |  !/¡ |  ?/¿ |   `  |   ~  |   /  |   *  |   -  |   +  |      |
-* |------+------+------+------+------+------+------+------+------+------+------+------|
-* | TRAN | TRAN | TRAN | TRAN |MO(BT)|      |      | TRAN | TRAN | TRAN | TRAN | TRAN |
-* `-----------------------------------------------------------------------------------'
-*/
-        [_LRIGHT_THUMB] = LAYOUT_split_3x6_3(
-            KC_NO  , KC_GRV , KC_AT  , KC_HASH,  KC_DLR           , KC_PERC              , KC_CIRC, KC_LBRC, KC_RBRC, KC_BSLS, KC_BSPC, KC_NO,
-            KC_NO  , KC_LT  , KC_GT  , KC_LCBR,  KC_RCBR          , KC_NO                , KC_UNDS, KC_LPRN, KC_RPRN, KC_COLN, KC_EQL , KC_NO,
-            KC_NO  , KC_AMPR, KC_PIPE, CKC_EXCL, CKC_QUES         , CKC_REPLACE_SHIFTED_2, KC_TILD, KC_SLSH, KC_ASTR, KC_MINS, KC_PLUS, KC_NO,
-            KC_TRNS,  KC_NO, KC_NO                , KC_NO  , KC_TRNS, KC_TRNS
-        ),
-/* _LMOVEMENT
- * ,-----------------------------------------------------------------------------------.
- * |      |      |      |      |      |      | Home | PgUp | PgDo | End  | Bksp |      |
- * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |      | LCtrl| LAlt |LShift| TRAN |      | Left | Down |  Up  | Righ | Del  |      |
- * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |      |Ctrl C|Ctrl V|Ctrl X|      |      |      |      |      |      |      |      |
- * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |      |      |      |S(TAB)|  TAB | ESC  | Space| Enter|  APP |      |      |      |
- * `-----------------------------------------------------------------------------------'
- */
-        [_LMOVEMENT] = LAYOUT_split_3x6_3(
-            KC_NO, KC_NO     , KC_NO     , KC_NO           , KC_NO  , KC_NO , KC_HOME, KC_PGUP, KC_PGDN, KC_END,  KC_BSPC, KC_NO,
-            KC_NO, KC_LCTL   , KC_LALT   , KC_LSFT         , KC_TRNS, KC_NO , KC_LEFT , KC_DOWN, KC_UP  , KC_RGHT, KC_DEL , KC_NO,
-            KC_NO, LCTL(KC_C), LCTL(KC_V), LCTL(KC_X)      , KC_NO  , KC_NO , KC_NO   , KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_NO,
-            LSFT(KC_TAB)    , KC_TAB , KC_ESC, KC_SPC  , KC_ENT , KC_APP
-        ),
-        [_LNUMBERS] = LAYOUT_split_3x6_3(
-            KC_LGUI, KC_LCTL, KC_LALT, KC_LSFT, KC_TRNS, KC_NO, KC_PSLS, KC_7, KC_8, KC_9, KC_PMNS, KC_BSPC,
-            KC_NO, KC_NO, KC_NO, KC_CALC, KC_NO, KC_NO, KC_PAST, KC_4, KC_5, KC_6, KC_PPLS, KC_DEL,
-            KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_1, KC_2, KC_3, KC_LPRN, KC_RPRN,
-            LSFT(KC_TAB), KC_TAB, KC_ENT, KC_SPC, KC_0, KC_PDOT
-        ),
-        [_LFUNCTIONKEYS] = LAYOUT_split_3x6_3(
-            KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_F7, KC_F8, KC_F9, KC_F12, KC_BSPC,
-            KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_F4, KC_F5, KC_F6, KC_F11, KC_DEL,
-            KC_LGUI, KC_LCTL, KC_LALT, KC_LSFT, KC_TRNS, KC_NO, KC_NO, KC_F1, KC_F2, KC_F3, KC_F10, KC_NO,
-            LSFT(KC_TAB), KC_TAB, KC_NO, KC_NO, KC_NO, KC_NO
-        ),
-        [_LMOVEMENT_RIGHT_PINK] = LAYOUT_split_3x6_3(
-            KC_NO, LGUI(KC_TAB), RCS(KC_T)   , LCTL(KC_F4) , LALT(KC_F4), KC_NO  , LGUI(KC_M), LGUI(KC_R), KC_NO, LGUI(KC_E), KC_NO  , KC_NO,
-            KC_NO, KC_LCTL     , KC_LALT     , KC_LSFT     , KC_LGUI    , KC_PSCR, KC_LEFT   , KC_DOWN   , KC_UP, KC_RGHT   , KC_TRNS, KC_NO,
-            KC_NO, RCS(KC_TAB) , LCTL(KC_TAB), KC_NO       , KC_NO      , KC_NO  , KC_NO     , KC_NO     , KC_NO, KC_NO     , KC_NO  , KC_NO,
-            LSFT(KC_TAB), KC_TAB     , KC_ESC , KC_NO     , KC_APP    , KC_NO
-        ),
-    };
-    platform_layout_init_2D_keymap((const uint16_t*)keymaps, 7, 8, 6);
+
+    //platform_layout_init_2D_keymap((const platform_keycode_t*)my_keymaps, 7, 8, 6);
+    // platform_layout_init_qmk_keymap(my_keymaps, 7);
+    platform_layout_init_custom_2D_keymap((void*)my_keymaps, 7, 8, 6, get_keycode_from_layer);
     pipeline_executor_create_config(2, 1);
 
     add_combo(0);
