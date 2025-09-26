@@ -1,5 +1,6 @@
 SRC += keymap_initializer.c
 SRC += monkeyboard_interface.c
+SRC += monkeeb_QMK_keycodes.c
 SRC += ../../../../modules/soycabanillas/src/monkeyboard_time_manager.c
 SRC += ../../../../modules/soycabanillas/src/monkeyboard_deferred_callbacks.c
 SRC += ../../../../modules/soycabanillas/src/key_event_buffer.c

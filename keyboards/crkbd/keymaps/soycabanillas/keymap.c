@@ -15,6 +15,7 @@
  */
 
 
+#include "keycodes.h"
 #include "modules/soycabanillas/src/monkeyboard_deferred_callbacks.h"
 #include "modules/soycabanillas/src/pipeline_combo.h"
 #include "modules/soycabanillas/src/pipeline_combo_initializer.h"
@@ -30,6 +31,7 @@
 #include "commons.h"
 #include "abstractionsqmk.h"
 #include "keymap_initializer.h"
+#include "monkeeb_QMK_keycodes.h"
 
 // // Layers
 // const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -202,10 +204,10 @@ const platform_keycode_t PROGMEM my_keymaps[][8][6] = {
 * `-----------------------------------------------------------------------------------'
 */
         [_LRIGHT_THUMB] = LAYOUT_split_3x6_3(
-            KC_NO  , KC_GRV , KC_AT  , KC_HASH,  KC_DLR           , KC_PERC              , KC_CIRC, KC_LBRC, KC_RBRC, KC_BSLS, KC_BSPC, KC_NO,
-            KC_NO  , KC_LT  , KC_GT  , KC_LCBR,  KC_RCBR          , KC_NO                , KC_UNDS, KC_LPRN, KC_RPRN, KC_COLN, KC_EQL , KC_NO,
-            KC_NO  , KC_AMPR, KC_PIPE, CKC_EXCL, CKC_QUES         , CKC_REPLACE_SHIFTED_2, KC_TILD, KC_SLSH, KC_ASTR, KC_MINS, KC_PLUS, KC_NO,
-            KC_TRNS,  KC_NO, KC_NO                , KC_NO  , KC_TRNS, KC_TRNS
+            KC_NO  , KC_GRV                , MONKEEB_LSFT(KC_2)        , MONKEEB_LSFT(KC_3)           , MONKEEB_LSFT(KC_4)            , MONKEEB_LSFT(KC_5)   , MONKEEB_LSFT(KC_6)    , KC_LBRC           , KC_RBRC           , KC_BSLS                   , KC_BSPC, KC_NO,
+            KC_NO  , MONKEEB_LSFT(KC_COMMA), MONKEEB_LSFT(KC_DOT)      , MONKEEB_LSFT(KC_LEFT_BRACKET), MONKEEB_LSFT(KC_RIGHT_BRACKET), KC_NO                , MONKEEB_LSFT(KC_MINUS), MONKEEB_LSFT(KC_9), MONKEEB_LSFT(KC_0), MONKEEB_LSFT(KC_SEMICOLON), KC_EQL , KC_NO,
+            KC_NO  , MONKEEB_LSFT(KC_7)    , MONKEEB_LSFT(KC_BACKSLASH), CKC_EXCL                     , CKC_QUES                      , CKC_REPLACE_SHIFTED_2, MONKEEB_LSFT(KC_GRAVE), KC_SLSH           , MONKEEB_LSFT(KC_8), KC_MINS                   , MONKEEB_LSFT(KC_EQUAL), KC_NO,
+            KC_TRNS, KC_NO                 , KC_NO                     , KC_NO                        , KC_TRNS                       , KC_TRNS
         ),
 /* _LMOVEMENT
  * ,-----------------------------------------------------------------------------------.
@@ -219,28 +221,28 @@ const platform_keycode_t PROGMEM my_keymaps[][8][6] = {
  * `-----------------------------------------------------------------------------------'
  */
         [_LMOVEMENT] = LAYOUT_split_3x6_3(
-            KC_NO, KC_NO     , KC_NO     , KC_NO           , KC_NO  , KC_NO , KC_HOME, KC_PGUP, KC_PGDN, KC_END,  KC_BSPC, KC_NO,
-            KC_NO, KC_LCTL   , KC_LALT   , KC_LSFT         , KC_TRNS, KC_NO , KC_LEFT , KC_DOWN, KC_UP  , KC_RGHT, KC_DEL , KC_NO,
-            KC_NO, LCTL(KC_C), LCTL(KC_V), LCTL(KC_X)      , KC_NO  , KC_NO , KC_NO   , KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_NO,
-            LSFT(KC_TAB)    , KC_TAB , KC_ESC, KC_SPC  , KC_ENT , KC_APP
+            KC_NO, KC_NO             , KC_NO             , KC_NO             , KC_NO  , KC_NO , KC_HOME, KC_PGUP, KC_PGDN, KC_END ,  KC_BSPC, KC_NO,
+            KC_NO, KC_LCTL           , KC_LALT           , KC_LSFT           , KC_TRNS, KC_NO , KC_LEFT , KC_DOWN, KC_UP  , KC_RGHT, KC_DEL , KC_NO,
+            KC_NO, MONKEEB_LCTL(KC_C), MONKEEB_LCTL(KC_V), MONKEEB_LCTL(KC_X), KC_NO  , KC_NO , KC_NO   , KC_NO  , KC_NO  , KC_NO  , KC_NO  , KC_NO,
+            MONKEEB_LSFT(KC_TAB)    , KC_TAB , KC_ESC            , KC_SPC            , KC_ENT , KC_APP
         ),
         [_LNUMBERS] = LAYOUT_split_3x6_3(
             KC_LGUI, KC_LCTL, KC_LALT, KC_LSFT, KC_TRNS, KC_NO, KC_PSLS, KC_7, KC_8, KC_9, KC_PMNS, KC_BSPC,
             KC_NO, KC_NO, KC_NO, KC_CALC, KC_NO, KC_NO, KC_PAST, KC_4, KC_5, KC_6, KC_PPLS, KC_DEL,
-            KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_1, KC_2, KC_3, KC_LPRN, KC_RPRN,
-            LSFT(KC_TAB), KC_TAB, KC_ENT, KC_SPC, KC_0, KC_PDOT
+            KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_1, KC_2, KC_3, MONKEEB_LSFT(KC_9), MONKEEB_LSFT(KC_0),
+            MONKEEB_LSFT(KC_TAB), KC_TAB, KC_ENT, KC_SPC, KC_0, KC_PDOT
         ),
         [_LFUNCTIONKEYS] = LAYOUT_split_3x6_3(
             KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_F7, KC_F8, KC_F9, KC_F12, KC_BSPC,
             KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_F4, KC_F5, KC_F6, KC_F11, KC_DEL,
             KC_LGUI, KC_LCTL, KC_LALT, KC_LSFT, KC_TRNS, KC_NO, KC_NO, KC_F1, KC_F2, KC_F3, KC_F10, KC_NO,
-            LSFT(KC_TAB), KC_TAB, KC_NO, KC_NO, KC_NO, KC_NO
+            MONKEEB_LSFT(KC_TAB), KC_TAB, KC_NO, KC_NO, KC_NO, KC_NO
         ),
         [_LMOVEMENT_RIGHT_PINK] = LAYOUT_split_3x6_3(
-            KC_NO, LGUI(KC_TAB), RCS(KC_T)   , LCTL(KC_F4) , LALT(KC_F4), KC_NO  , LGUI(KC_M), LGUI(KC_R), KC_NO, LGUI(KC_E), KC_NO  , KC_NO,
+            KC_NO, MONKEEB_LGUI(KC_TAB), MONKEEB_RCS(KC_T)   , MONKEEB_LCTL(KC_F4) , MONKEEB_LALT(KC_F4), KC_NO  , MONKEEB_LGUI(KC_M), MONKEEB_LGUI(KC_R), KC_NO, MONKEEB_LGUI(KC_E), KC_NO  , KC_NO,
             KC_NO, KC_LCTL     , KC_LALT     , KC_LSFT     , KC_LGUI    , KC_PSCR, KC_LEFT   , KC_DOWN   , KC_UP, KC_RGHT   , KC_TRNS, KC_NO,
-            KC_NO, RCS(KC_TAB) , LCTL(KC_TAB), KC_NO       , KC_NO      , KC_NO  , KC_NO     , KC_NO     , KC_NO, KC_NO     , KC_NO  , KC_NO,
-            LSFT(KC_TAB), KC_TAB     , KC_ESC , KC_NO     , KC_APP    , KC_NO
+            KC_NO, MONKEEB_RCS(KC_TAB) , MONKEEB_LCTL(KC_TAB), KC_NO       , KC_NO      , KC_NO  , KC_NO     , KC_NO     , KC_NO, KC_NO     , KC_NO  , KC_NO,
+            MONKEEB_LSFT(KC_TAB), KC_TAB     , KC_ESC , KC_NO     , KC_APP    , KC_NO
         ),
 };
 
@@ -349,8 +351,8 @@ void add_combo(uint8_t pipeline_index) {
 
     pipeline_combo_key_t* combo1_keys[] = { combo_key_a, combo_key_b };
 
-    pipeline_combo_key_translation_t press_action_combo1 = create_combo_key_action(COMBO_KEY_ACTION_REGISTER, KC_AT);
-    pipeline_combo_key_translation_t release_action_combo1 = create_combo_key_action(COMBO_KEY_ACTION_UNREGISTER, KC_AT);
+    pipeline_combo_key_translation_t press_action_combo1 = create_combo_key_action(COMBO_KEY_ACTION_REGISTER, MONKEEB_LSFT(KC_2));
+    pipeline_combo_key_translation_t release_action_combo1 = create_combo_key_action(COMBO_KEY_ACTION_UNREGISTER, MONKEEB_LSFT(KC_2));
 
     pipeline_combo_config_t* combo1 = create_combo(2, combo1_keys, press_action_combo1, release_action_combo1);
     combo_config->combos[0] = combo1;
