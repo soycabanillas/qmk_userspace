@@ -4,6 +4,7 @@
 #include "modules/soycabanillas/src/platform_interface.h"
 #include "modules/soycabanillas/src/platform_types.h"
 #include "modules/soycabanillas/src/platform_layout.h"
+#include "quantum.h"
 
 
 // Key operations
@@ -23,11 +24,15 @@ void platform_register_keycode(platform_keycode_t keycode) {
     // if (MOD32_LSFT & keycode) add_weak_mods(MODIFIER_LEFT_SHIFT);
     // if (MOD32_LCTL & keycode) add_weak_mods(MODIFIER_LEFT_CTRL);
     add_weak_mods((keycode & 0x0000FF00) >> 8); // Add modifier bits
-    register_code(keycode);
+    add_key(keycode);
+    send_keyboard_report();
+    //register_code16(keycode & 0x000000FF); // Register the basic key
 }
 
 void platform_unregister_keycode(platform_keycode_t keycode) {
-    unregister_code(keycode);
+    del_weak_mods(0xFF);
+    del_key(keycode);
+    send_keyboard_report();
     // if (MOD32_RGUI  & keycode) del_weak_mods(KC_RGUI);
     // if (MOD32_RALT  & keycode) del_weak_mods(KC_RALT);
     // if (MOD32_RSFT  & keycode) del_weak_mods(KC_RSFT);
