@@ -26,7 +26,6 @@ void platform_register_keycode(platform_keycode_t keycode) {
     add_weak_mods((keycode & 0x0000FF00) >> 8); // Add modifier bits
     add_key(keycode);
     send_keyboard_report();
-    //register_code16(keycode & 0x000000FF); // Register the basic key
 }
 
 void platform_unregister_keycode(platform_keycode_t keycode) {
