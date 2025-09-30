@@ -12,9 +12,8 @@ typedef enum  {
   _LMOVEMENT_RIGHT_PINK,
 } custom_layers;
 
-
 // Custom Keycode Declarations
-enum planck_keycodes {
+typedef enum {
   CKC_LAY_NUMBERS_R = CUSTOM_KEYCODE_MIN,
   CKC_LAY_MOVEMENT_F,
   CKC_LAY_FUNCTIONKEYS_V,
@@ -44,4 +43,4 @@ enum planck_keycodes {
 //   CKC_REPLACE_SHIFTED_6,
 //   CKC_REPLACE_SHIFTED_9,
 //   CKC_REPLACE_SHIFTED_0,
-};
+} custom_keycodes;

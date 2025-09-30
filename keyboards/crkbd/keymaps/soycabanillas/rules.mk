@@ -1,4 +1,3 @@
-SRC += keymap_initializer.c
 SRC += keyboard_setup.c
 SRC += monkeyboard_interface.c
 SRC += ../../../../modules/soycabanillas/src/monkeyboard_time_manager.c
