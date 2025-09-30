@@ -1,10 +1,11 @@
-#include "action.h"
+// #include "action.h"
 #include "action_util.h"
 #include "modules/soycabanillas/src/monkeyboard_deferred_callbacks.h"
 #include "modules/soycabanillas/src/platform_interface.h"
 #include "modules/soycabanillas/src/platform_types.h"
 #include "modules/soycabanillas/src/platform_layout.h"
-#include "quantum.h"
+#include "timer.h"
+//#include "quantum.h"
 
 
 // Key operations
@@ -15,14 +16,6 @@ void platform_tap_keycode(platform_keycode_t keycode) {
 }
 
 void platform_register_keycode(platform_keycode_t keycode) {
-    // if (MOD32_RGUI & keycode) c(MODIFIER_RIGHT_GUI);
-    // if (MOD32_RALT & keycode) add_weak_mods(MODIFIER_RIGHT_ALT);
-    // if (MOD32_RSFT & keycode) add_weak_mods(MODIFIER_RIGHT_SHIFT);
-    // if (MOD32_RCTL & keycode) add_weak_mods(MODIFIER_RIGHT_CTRL);
-    // if (MOD32_LGUI & keycode) add_weak_mods(MODIFIER_LEFT_GUI);
-    // if (MOD32_LALT & keycode) add_weak_mods(MODIFIER_LEFT_ALT);
-    // if (MOD32_LSFT & keycode) add_weak_mods(MODIFIER_LEFT_SHIFT);
-    // if (MOD32_LCTL & keycode) add_weak_mods(MODIFIER_LEFT_CTRL);
     add_weak_mods((keycode & 0x0000FF00) >> 8); // Add modifier bits
     add_key(keycode);
     send_keyboard_report();
@@ -32,14 +25,6 @@ void platform_unregister_keycode(platform_keycode_t keycode) {
     del_weak_mods(0xFF);
     del_key(keycode);
     send_keyboard_report();
-    // if (MOD32_RGUI  & keycode) del_weak_mods(KC_RGUI);
-    // if (MOD32_RALT  & keycode) del_weak_mods(KC_RALT);
-    // if (MOD32_RSFT  & keycode) del_weak_mods(KC_RSFT);
-    // if (MOD32_RCTL  & keycode) del_weak_mods(KC_RCTL);
-    // if (MOD32_LGUI  & keycode) del_weak_mods(KC_LGUI);
-    // if (MOD32_LALT  & keycode) del_weak_mods(KC_LALT);
-    // if (MOD32_LSFT  & keycode) del_weak_mods(KC_LSFT);
-    // if (MOD32_LCTL  & keycode) del_weak_mods(KC_LCTL);
 }
 
 void platform_add_key(platform_keycode_t keycode) {

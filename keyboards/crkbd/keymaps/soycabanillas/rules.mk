@@ -1,11 +1,12 @@
 SRC += keymap_initializer.c
+SRC += keyboard_setup.c
 SRC += monkeyboard_interface.c
-SRC += monkeeb_QMK_keycodes.c
 SRC += ../../../../modules/soycabanillas/src/monkeyboard_time_manager.c
 SRC += ../../../../modules/soycabanillas/src/monkeyboard_deferred_callbacks.c
 SRC += ../../../../modules/soycabanillas/src/key_event_buffer.c
 SRC += ../../../../modules/soycabanillas/src/key_press_buffer.c
 SRC += ../../../../modules/soycabanillas/src/key_virtual_buffer.c
+SRC += ../../../../modules/soycabanillas/src/monkeyboard_keycodes.c
 SRC += ../../../../modules/soycabanillas/src/monkeyboard_layer_manager.c
 SRC += ../../../../modules/soycabanillas/src/pipeline_combo_initializer.c
 SRC += ../../../../modules/soycabanillas/src/pipeline_combo.c
